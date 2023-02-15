@@ -1,0 +1,17 @@
+{% if request.user.is_authenticated %}
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+<a href="{% url 'passengers:home' %}">Passengers interface</a>
+
+<h3>Welcome, {{request.user.first_name}}</h3>
+
+{% if request.user.is_airlines_staff %}
+<a href="{% url 'staff:home' %}">Staff interface</a>
+{% endif %}
+
+{% else %}
+
+<a href="{% url 'accounts:login' %}">Login</a>
+<a href="{% url 'accounts:register' %}">Register</a>
+
+{% endif %}
