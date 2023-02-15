@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+{% for person in staff %}
+<ul>
+    <li>
+        <p>{{person.user.first_name}} {{person.user.last_name}}, role: {{person.get_role_display }}.
+            <a href="{% url 'staff:edit role' person.id %}">Edit role.</a>
+        </p>
+    </li>
+</ul>
+{% endfor %}
+
+{% endblock %}

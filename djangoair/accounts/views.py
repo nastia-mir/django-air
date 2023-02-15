@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
-from .forms import StaffCreationForm
-from .models import MyUser, Staff, Passenger
+from accounts.forms import MyUserCreationForm
+from accounts.models import MyUser, Staff, Passenger
 
 
 class LoginView(ProcessFormView):
@@ -34,7 +34,7 @@ class LoginView(ProcessFormView):
 
 class RegisterView(FormView):
     template_name = "register.html"
-    form_class = StaffCreationForm
+    form_class = MyUserCreationForm
     success_url = '/login/'
 
     def form_valid(self, form):

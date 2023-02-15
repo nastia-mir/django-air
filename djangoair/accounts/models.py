@@ -49,7 +49,7 @@ class Staff(models.Model):
         ('checkin_manager', 'Checkin manager'),
         ('supervisor', 'Supervisor')
     )
-    role = models.CharField(max_length=25, choices=roles, blank=True)
+    role = models.CharField(max_length=50, choices=roles, blank=True)
 
     objects = models.Manager()
 

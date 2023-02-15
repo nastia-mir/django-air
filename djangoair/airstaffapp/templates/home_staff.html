@@ -2,5 +2,22 @@
 
 {% block content %}
 
-<h1>Here will be homepage for staff interface</h1>
+{% if role %}
+<h3>Your role is {{role}}.</h3>
+{% else %}
+<h3>You do not have a role yet. Please, contact your supervisor.</h3>
+{% endif %}
+
+{% if role == 'supervisor' %}
+
+<p>You can
+    <a href="{% url 'staff:staff list' %}">see staff list</a>.
+</p>
+
+{% else %}
+
+<p>Here wii be some functioncs</p>
+
+{% endif %}
+
 {% endblock %}
