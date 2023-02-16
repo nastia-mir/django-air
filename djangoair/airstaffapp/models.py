@@ -42,21 +42,13 @@ class Flight(models.Model):
     price = models.IntegerField(blank=False, null=False)
     flight_options = models.OneToOneField(FlightOptions, on_delete=models.CASCADE,  related_name="flight_options")
 
-    is_completed = models.BooleanField(default=False)
+    # is_completed = models.BooleanField(default=False)
     is_canceled = models.BooleanField(default=False)
 
     objects = models.Manager()
 
     def __str__(self):
-        if self.is_completed:
-            return 'Destination: {}; date: {}. Completed.'.format(self.destination, self.date)
-        elif self.is_canceled:
+        if self.is_canceled:
             return 'Destination: {}; date: {}. Canceled.'.format(self.destination, self.date)
         else:
             return 'Destination: {}; date: {}'.format(self.destination, self.date)
-
-    def cancel_flight(self):
-        self.is_canceled = True
-
-    def mark_completed(self):
-        self.is_completed = True
