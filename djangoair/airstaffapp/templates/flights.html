@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<p><a href="{% url 'staff:create flight' %}">Create new flight</a></p>
+
+{% if empty %}
+
+<p>There's no flights yet.</p>
+
+{% else %}
+
+{% for flight in flight_list %}
+
+<p>{{flight}}</p>
+
+<p>
+    <a href="{% url 'staff:edit flight options' flight.id %}">Edit options</a>
+    <a href="{% url 'staff:cancel flight' flight.id %}">Cancel flight</a>
+</p>
+
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

@@ -3,6 +3,7 @@ from django.views.generic.edit import ProcessFormView, ModelFormMixin
 from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
+from airstaffapp.models import Flight, FlightOptions
 from airstaffapp.forms import StaffRoleEditForm
 
 
@@ -47,3 +48,31 @@ class EditRoleView(UpdateView):
         form_data = form.save(commit=False)
         form_data.save()
         return super().form_valid(form)
+
+
+class FlightsView(TemplateView):
+    template_name = 'flights.html'
+
+    def get_context_data(self):
+        context = super(FlightsView, self).get_context_data()
+        flights = Flight.objects.all()
+        if len(flights) == 0:
+            context['empty'] = True
+        else:
+            context['flights'] = flights
+
+        return context
+
+
+
+
+class CreateFlightView(TemplateView):
+    template_name = 'create_flight.html'
+
+
+class EditFlightView(TemplateView):
+    template_name = 'edit_flight.html'
+
+
+class CancelFlightView(TemplateView):
+    template_name = 'cancel_flight.html'
