@@ -1,5 +1,6 @@
 from django.forms import ModelForm
 from django.forms.widgets import DateInput
+
 from accounts.models import Staff
 from airstaffapp.models import Flight, FlightOptions
 
@@ -24,8 +25,3 @@ class FlightCreationForm(ModelForm):
         widget = {
             'date': DateInput(attrs={'type': 'date'})
         }
-
-
-
-
-

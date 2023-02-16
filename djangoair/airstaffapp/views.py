@@ -56,7 +56,7 @@ class FlightsView(TemplateView):
 
     def get_context_data(self):
         context = super(FlightsView, self).get_context_data()
-        flights = Flight.objects.all()
+        flights = Flight.objects.all().order_by('date')
         if len(flights) == 0:
             context['empty'] = True
         else:
@@ -64,7 +64,7 @@ class FlightsView(TemplateView):
         return context
 
 
-class CreateFlightView(LoginRequiredMixin, CreateView):
+class CreateFlightView(CreateView):
 
     def get(self, request, *args, **kwargs):
         context = {'flight_form': FlightCreationForm,
@@ -83,9 +83,42 @@ class CreateFlightView(LoginRequiredMixin, CreateView):
         return redirect(reverse('staff:flights'))
 
 
-class EditFlightView(TemplateView):
+class EditFlightView(UpdateView):
     template_name = 'edit_flight.html'
+    model = FlightOptions
+    fields = '__all__'
+
+    def get_success_url(self):
+        return reverse('staff:flights')
+
+    def get_context_data(self):
+        context = super(EditFlightView, self).get_context_data()
+        flight = Flight.objects.get(id=self.kwargs['pk'])
+        context['flight'] = flight
+        options = flight.flight_options
+        context['options'] = options
+        return context
 
 
-class CancelFlightView(TemplateView):
+class CancelFlightView(UpdateView):
     template_name = 'cancel_flight.html'
+    model = Flight
+    fields = ['is_canceled']
+
+    def get_context_data(self):
+        context = super(CancelFlightView, self).get_context_data()
+        flight = Flight.objects.get(id=self.kwargs['pk'])
+        context['flight'] = flight
+        return context
+
+    def post(self, request, pk):
+        try:
+            flight = Flight.objects.get(id=self.kwargs['pk'])
+            flight.is_canceled = True
+            flight.save()
+            return redirect(reverse('staff:flights'))
+        except:
+            return redirect(reverse('staff:flights'))
+
+
+

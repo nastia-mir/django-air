@@ -2,8 +2,14 @@
 
 {% block content %}
 
-<h1>Here will be editing flights page</h1>
+<h2>Options for flight {{flight}}:</h2>
 
-{% endfor %}
+<form method="POST" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Save options"/>
+</form>
+
+
 
 {% endblock %}

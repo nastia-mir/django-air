@@ -5,9 +5,7 @@
 <p><a href="{% url 'staff:create flight' %}">Create new flight</a></p>
 
 {% if empty %}
-
 <p>There's no flights yet.</p>
-
 {% else %}
 
 {% for flight in flights %}
@@ -20,7 +18,6 @@
 </p>
 
 {% endfor %}
-
 {% endif %}
 
 {% endblock %}
