@@ -1,3 +1,5 @@
 from django.contrib import admin
+from airstaffapp.models import Flight, FlightOptions
 
-# Register your models here.
+admin.site.register(Flight)
+admin.site.register(FlightOptions)

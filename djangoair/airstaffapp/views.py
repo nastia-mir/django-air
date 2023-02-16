@@ -1,10 +1,11 @@
-from django.views.generic import TemplateView, FormView, UpdateView
+from django.views.generic import TemplateView, FormView, UpdateView, CreateView
 from django.views.generic.edit import ProcessFormView, ModelFormMixin
 from django.shortcuts import render, redirect, reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.models import Staff
 from airstaffapp.models import Flight, FlightOptions
-from airstaffapp.forms import StaffRoleEditForm
+from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, FlightOptionsForm
 
 
 class HomeView(TemplateView):
@@ -60,14 +61,26 @@ class FlightsView(TemplateView):
             context['empty'] = True
         else:
             context['flights'] = flights
-
         return context
 
 
+class CreateFlightView(LoginRequiredMixin, CreateView):
 
+    def get(self, request, *args, **kwargs):
+        context = {'flight_form': FlightCreationForm,
+                   'options_form': FlightOptionsForm}
+        return render(request, 'create_flight.html', context)
 
-class CreateFlightView(TemplateView):
-    template_name = 'create_flight.html'
+    def post(self, request, *args, **kwargs):
+        flight_form = FlightCreationForm(request.POST)
+        options_form = FlightOptionsForm(request.POST)
+        if flight_form.is_valid() and options_form.is_valid():
+            options = options_form.save()
+            flight = flight_form.save(commit=False)
+            flight.flight_options = options
+            flight.save()
+            return redirect(reverse('staff:flights'))
+        return redirect(reverse('staff:flights'))
 
 
 class EditFlightView(TemplateView):

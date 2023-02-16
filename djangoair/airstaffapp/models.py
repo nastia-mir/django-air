@@ -5,20 +5,20 @@ class FlightOptions(models.Model):
     lunch = models.BooleanField(default=True)
     lunch_price = models.IntegerField(blank=False, null=False)
     luggage_options = (
-        (0, 'No luggage'),
-        (1, 'One luggage'),
-        (2, 'Two luggage')
+        ('0', 'No luggage'),
+        ('1', 'One luggage'),
+        ('2', 'Two luggage')
     )
-    luggage = models.IntegerField(choices=luggage_options)
+    luggage = models.CharField(max_length=50, choices=luggage_options)
     luggage_price = models.IntegerField(blank=False, null=False)
 
     objects = models.Manager()
 
     def __str__(self):
         if self.lunch:
-            return '{}, lunch available.'.format(self.luggage_options)
+            return '{}, lunch available.'.format(self.get_luggage_display())
         if self.lunch:
-            return '{}, lunch not available.'.format(self.luggage_options)
+            return '{}, lunch not available.'.format(self.get_luggage_display())
 
 
 class Flight(models.Model):

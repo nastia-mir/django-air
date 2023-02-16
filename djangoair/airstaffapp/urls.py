@@ -8,7 +8,7 @@ urlpatterns = [
 
     path('flights/', views.FlightsView.as_view(), name='flights'),
     path('flights/create', views.CreateFlightView.as_view(), name='create flight'),
-    path('flights/<pk>/edit', views.EditFlightView.as_view(), name='edit flight option'),
+    path('flights/<pk>/edit', views.EditFlightView.as_view(), name='edit flight options'),
     path('flights/<pk>/cancel', views.CancelFlightView.as_view(), name='cancel flight'),
 
 

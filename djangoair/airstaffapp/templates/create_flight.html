@@ -2,8 +2,12 @@
 
 {% block content %}
 
-<h1>Here will be creating flights page</h1>
-
+<form method="POST" action="">
+    {% csrf_token %}
+    {{flight_form.as_p}}
+    {{options_form.as_p}}
+    <input type="submit" value="Create flight"/>
+</form>
 
 
 {% endblock %}
