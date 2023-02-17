@@ -1,6 +1,8 @@
 {% extends 'main.html' %}
 {% block content %}
 
+{% if request_user_role == 'supervisor' %}
+
 <p>{{person.user.first_name}} {{person.user.last_name}}</p>
 
 <form method="POST" action="">
@@ -8,4 +10,9 @@
     {{form.as_p}}
     <input type="submit" value="Submit"/>
 </form>
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
+
 {% endblock %}

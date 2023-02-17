@@ -92,6 +92,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'accounts.MyUser'
 
+LOGIN_URL = 'accounts:login'
+LOGOUT_URL = 'accounts:logout'
+#LOGIN_REDIRECT_URL = 'home'
+
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'

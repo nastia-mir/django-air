@@ -1,9 +1,8 @@
-from django.views.generic import TemplateView, FormView, UpdateView, CreateView
-from django.views.generic.edit import ProcessFormView, ModelFormMixin
+from django.views.generic import TemplateView, UpdateView, CreateView
 from django.shortcuts import render, redirect, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.models import Staff
+
 from airstaffapp.models import Flight, FlightOptions
 from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, FlightOptionsForm
 
@@ -28,6 +27,7 @@ class StaffListView(TemplateView):
             if person.role != 'supervisor':
                 editable_staff.append(person)
         context['staff'] = editable_staff
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
@@ -43,6 +43,7 @@ class EditRoleView(UpdateView):
         context = super(EditRoleView, self).get_context_data()
         person = Staff.objects.get(id=self.kwargs['pk'])
         context['person'] = person
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
     def form_valid(self, form):
@@ -57,6 +58,7 @@ class FlightsView(TemplateView):
     def get_context_data(self):
         context = super(FlightsView, self).get_context_data()
         flights = Flight.objects.all().order_by('date')
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         if len(flights) == 0:
             context['empty'] = True
         else:
@@ -68,7 +70,8 @@ class CreateFlightView(CreateView):
 
     def get(self, request, *args, **kwargs):
         context = {'flight_form': FlightCreationForm,
-                   'options_form': FlightOptionsForm}
+                   'options_form': FlightOptionsForm,
+                   'request_user_role': Staff.objects.get(user=self.request.user).role}
         return render(request, 'create_flight.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -97,6 +100,7 @@ class EditFlightView(UpdateView):
         context['flight'] = flight
         options = flight.flight_options
         context['options'] = options
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
@@ -109,6 +113,7 @@ class CancelFlightView(UpdateView):
         context = super(CancelFlightView, self).get_context_data()
         flight = Flight.objects.get(id=self.kwargs['pk'])
         context['flight'] = flight
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
     def post(self, request, pk):

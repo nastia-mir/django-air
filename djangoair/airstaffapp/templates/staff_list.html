@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
-
 {% block content %}
+
+{% if request_user_role == 'supervisor' %}
 
 {% for person in staff %}
 <ul>
@@ -11,5 +12,9 @@
     </li>
 </ul>
 {% endfor %}
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
 
 {% endblock %}

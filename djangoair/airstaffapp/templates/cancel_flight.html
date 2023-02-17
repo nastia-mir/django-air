@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
-
 {% block content %}
+
+{% if request_user_role == 'supervisor' %}
 
 <h2>Are you sure you want to cancel flight {{flight}}?</h2>
 
@@ -9,5 +10,8 @@
     <input type="submit" class="btn btn-danger" value="Cancel flight"/>
 </form>
 
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
 
 {% endblock %}
