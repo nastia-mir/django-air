@@ -44,7 +44,7 @@ class Flight(models.Model):
     destination = models.CharField(max_length=500, choices=destinations)
     date = models.DateField(auto_now=False, auto_now_add=False)
     passengers = models.IntegerField(blank=False, null=False)
-    price = models.IntegerField(blank=False, null=False)
+    ticket_price = models.IntegerField(blank=False, null=False)
     lunch = models.ManyToManyField(LunchOptions, related_name='lunch')
     luggage = models.ManyToManyField(LuggageOptions, related_name='luggage')
 
@@ -55,6 +55,6 @@ class Flight(models.Model):
 
     def __str__(self):
         if self.is_canceled:
-            return 'Destination: {}; date: {}. Canceled.'.format(self.destination, self.date)
+            return 'Destination: {}; date: {}. Canceled.'.format(self.get_destination_display(), self.date)
         else:
-            return 'Destination: {}; date: {}'.format(self.destination, self.date)
+            return 'Destination: {}; date: {}'.format(self.get_destination_display(), self.date)

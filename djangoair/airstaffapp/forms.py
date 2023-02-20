@@ -11,12 +11,6 @@ class StaffRoleEditForm(ModelForm):
         fields = ['role']
 
 
-'''class FlightOptionsForm(ModelForm):
-    class Meta:
-        model = FlightOptions
-        fields = '__all__'''
-
-
 class LunchOptionsForm(ModelForm):
     class Meta:
         model = LunchOptions
@@ -32,7 +26,7 @@ class LuggageOptionsForm(ModelForm):
 class FlightCreationForm(ModelForm):
     class Meta:
         model = Flight
-        fields = ['destination', 'date', 'passengers', 'price']
+        fields = ['destination', 'date', 'passengers', 'ticket_price', 'lunch', 'luggage']
 
         widget = {
             'date': DateInput(attrs={'type': 'date'})

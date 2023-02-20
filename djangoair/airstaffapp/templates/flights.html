@@ -18,7 +18,6 @@
 {% if not flight.is_canceled %}
 
 <p>
-    <a href="{% url 'staff:edit flight options' flight.id %}">Edit options</a>
     <a href="{% url 'staff:cancel flight' flight.id %}">Cancel flight</a>
 </p>
 

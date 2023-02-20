@@ -117,6 +117,45 @@ class LuggageOptionsDeleteView(DeleteView):
         return redirect(reverse('staff:luggage options'))
 
 
+class CreateFlightView(CreateView):
+
+    def get(self, request):
+        context = {
+            'request_user_role': Staff.objects.get(user=request.user).role,
+            'form': FlightCreationForm
+        }
+        return render(request, 'create_flight.html', context)
+
+    def post(self, request):
+        form = FlightCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('staff:flights'))
+
+
+class CancelFlightView(UpdateView):
+    template_name = 'cancel_flight.html'
+    model = Flight
+    fields = ['is_canceled']
+
+    def get_context_data(self):
+        context = super(CancelFlightView, self).get_context_data()
+        flight = Flight.objects.get(id=self.kwargs['pk'])
+        context['flight'] = flight
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        return context
+
+    def post(self, request, pk):
+        try:
+            flight = Flight.objects.get(id=self.kwargs['pk'])
+            flight.is_canceled = True
+            flight.save()
+            return redirect(reverse('staff:flights'))
+        except:
+            return redirect(reverse('staff:flights'))
+
+
+
 
 
 
