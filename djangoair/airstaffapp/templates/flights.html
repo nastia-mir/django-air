@@ -13,7 +13,9 @@
 
 
 
-<p>{{flight}}</p>
+<p>
+    <a href="{% url 'staff:flight details' flight.id %}">{{flight}}</a>
+</p>
 
 {% if not flight.is_canceled %}
 

@@ -1,5 +1,4 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
-from django.views import View
 from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
@@ -133,6 +132,21 @@ class CreateFlightView(CreateView):
             return redirect(reverse('staff:flights'))
 
 
+class FlightDetailsView(TemplateView):
+    template_name = 'flight_details.html'
+
+    def get_context_data(self, pk):
+        context = super(FlightDetailsView, self).get_context_data()
+        flight = Flight.objects.get(id=pk)
+        luggage = flight.luggage.all()
+        lunch = flight.lunch.all()
+        context['flight'] = flight
+        context['luggage'] = list(luggage)
+        context['lunch'] = list(lunch)
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        return context
+
+
 class CancelFlightView(UpdateView):
     template_name = 'cancel_flight.html'
     model = Flight
@@ -140,8 +154,7 @@ class CancelFlightView(UpdateView):
 
     def get_context_data(self):
         context = super(CancelFlightView, self).get_context_data()
-        flight = Flight.objects.get(id=self.kwargs['pk'])
-        context['flight'] = flight
+        context['flight'] = Flight.objects.get(id=self.kwargs['pk'])
         context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 

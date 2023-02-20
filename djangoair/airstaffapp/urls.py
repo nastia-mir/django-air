@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('flights/', login_required(views.FlightsView.as_view()), name='flights'),
     path('flights/create', login_required(views.CreateFlightView.as_view()), name='create flight'),
-    #path('flights/<pk>/edit', login_required(views.EditFlightView.as_view()), name='edit flight options'),
+    path('flights/<pk>/details', login_required(views.FlightDetailsView.as_view()), name='flight details'),
     path('flights/<pk>/cancel', login_required(views.CancelFlightView.as_view()), name='cancel flight'),
 
 

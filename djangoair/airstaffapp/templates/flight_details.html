@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if request_user_role == 'supervisor' %}
+
+<p>Destination: {{flight.get_destination_display}}</p>
+<p>Date: {{flight.date}}</p>
+<p>Passengers allowed: {{flight.passengers}}</p>
+<p>Ticket price: {{flight.ticket_price}}$</p>
+
+<p>Luggage options:
+    {% for item in luggage %}
+    {{item.get_quantity_display}}, {{item.price}}$;
+    {% endfor %}
+
+</p>
+<p>Lunch options:
+    {% for item in lunch %}
+    {{item.description}}, {{item.price}}$;
+    {% endfor %}
+</p>
+
+{% if flight.is_canceled %}
+<p>Canceled</p>
+{% endif %}
+
+<br/>
+
+<a href="{% url 'staff:flights' %}">Back to flight list</a>
+
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
+
+{% endblock %}
