@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django.forms.widgets import DateInput
 
 from accounts.models import Staff
-from airstaffapp.models import Flight, FlightOptions
+from airstaffapp.models import Flight, LunchOptions, LuggageOptions
 
 
 class StaffRoleEditForm(ModelForm):
@@ -11,9 +11,21 @@ class StaffRoleEditForm(ModelForm):
         fields = ['role']
 
 
-class FlightOptionsForm(ModelForm):
+'''class FlightOptionsForm(ModelForm):
     class Meta:
         model = FlightOptions
+        fields = '__all__'''
+
+
+class LunchOptionsForm(ModelForm):
+    class Meta:
+        model = LunchOptions
+        fields = '__all__'
+
+
+class LuggageOptionsForm(ModelForm):
+    class Meta:
+        model = LuggageOptions
         fields = '__all__'
 
 

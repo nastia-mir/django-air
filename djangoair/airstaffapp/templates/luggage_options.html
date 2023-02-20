@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if request_user_role == 'supervisor' %}
+
+<form method="POST" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Create"/>
+</form>
+
+
+{% for luggage in options %}
+<p>{{luggage}}
+    <a href="{% url 'staff:delete luggage' luggage.id %}">Delete</a>
+</p>
+{% endfor %}
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
+
+{% endblock %}

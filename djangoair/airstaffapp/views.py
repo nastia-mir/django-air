@@ -1,10 +1,11 @@
-from django.views.generic import TemplateView, UpdateView, CreateView
+from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
+from django.views import View
 from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
 
-from airstaffapp.models import Flight, FlightOptions
-from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, FlightOptionsForm
+from airstaffapp.models import Flight, LunchOptions, LuggageOptions
+from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm
 
 
 class HomeView(TemplateView):
@@ -66,64 +67,58 @@ class FlightsView(TemplateView):
         return context
 
 
-class CreateFlightView(CreateView):
+class LunchOptionsView(CreateView):
 
-    def get(self, request, *args, **kwargs):
-        context = {'flight_form': FlightCreationForm,
-                   'options_form': FlightOptionsForm,
-                   'request_user_role': Staff.objects.get(user=self.request.user).role}
-        return render(request, 'create_flight.html', context)
+    def get(self, request):
+        context = {
+            'options': LunchOptions.objects.all(),
+            'request_user_role': Staff.objects.get(user=request.user).role,
+            'form': LunchOptionsForm
+        }
+        return render(request, 'lunch_options.html', context)
 
-    def post(self, request, *args, **kwargs):
-        flight_form = FlightCreationForm(request.POST)
-        options_form = FlightOptionsForm(request.POST)
-        if flight_form.is_valid() and options_form.is_valid():
-            options = options_form.save()
-            flight = flight_form.save(commit=False)
-            flight.flight_options = options
-            flight.save()
-            return redirect(reverse('staff:flights'))
-        return redirect(reverse('staff:flights'))
+    def post(self, request):
+        form = LunchOptionsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('staff:lunch options'))
 
 
-class EditFlightView(UpdateView):
-    template_name = 'edit_flight.html'
-    model = FlightOptions
-    fields = '__all__'
+class LunchOptionsDeleteView(DeleteView):
 
-    def get_success_url(self):
-        return reverse('staff:flights')
-
-    def get_context_data(self):
-        context = super(EditFlightView, self).get_context_data()
-        flight = Flight.objects.get(id=self.kwargs['pk'])
-        context['flight'] = flight
-        options = flight.flight_options
-        context['options'] = options
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
-        return context
+    def get(self, request, pk):
+        lunch = LunchOptions.objects.get(id=pk)
+        lunch.delete()
+        return redirect(reverse('staff:lunch options'))
 
 
-class CancelFlightView(UpdateView):
-    template_name = 'cancel_flight.html'
-    model = Flight
-    fields = ['is_canceled']
+class LuggageOptionsView(CreateView):
 
-    def get_context_data(self):
-        context = super(CancelFlightView, self).get_context_data()
-        flight = Flight.objects.get(id=self.kwargs['pk'])
-        context['flight'] = flight
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
-        return context
+    def get(self, request):
+        context = {
+            'options': LuggageOptions.objects.all(),
+            'request_user_role': Staff.objects.get(user=request.user).role,
+            'form': LuggageOptionsForm
+        }
+        return render(request, 'luggage_options.html', context)
 
-    def post(self, request, pk):
-        try:
-            flight = Flight.objects.get(id=self.kwargs['pk'])
-            flight.is_canceled = True
-            flight.save()
-            return redirect(reverse('staff:flights'))
-        except:
-            return redirect(reverse('staff:flights'))
+    def post(self, request):
+        form = LuggageOptionsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('staff:luggage options'))
+
+
+class LuggageOptionsDeleteView(DeleteView):
+
+    def get(self, request, pk):
+        luggage = LuggageOptions.objects.get(id=pk)
+        luggage.delete()
+        return redirect(reverse('staff:luggage options'))
+
+
+
+
 
 
 

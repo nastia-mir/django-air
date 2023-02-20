@@ -1,6 +1,7 @@
 {% extends  "main.html" %}
-
 {% block content %}
+
+{% if request.user.is_airlines_staff %}
 
 {% if role %}
 <h3>Your role is {{role}}.</h3>
@@ -18,10 +19,20 @@
     <a href="{% url 'staff:flights' %}">see flights</a>.
 </p>
 
+<p>
+    <a href="{% url 'staff:lunch options' %}">Lunch options.</a>
+</p>
+
+<p>
+    <a href="{% url 'staff:luggage options' %}">Lunch options.</a>
+</p>
+
 {% else %}
-
 <p>Here will be some functioncs</p>
+{% endif %}
 
+{% else %}
+<h2>You do not have access to this page.</h2>
 {% endif %}
 
 {% endblock %}
