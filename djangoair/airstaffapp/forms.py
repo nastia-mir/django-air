@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, CheckboxSelectMultiple
 from django.forms.widgets import DateInput
 
 from accounts.models import Staff
@@ -29,5 +29,7 @@ class FlightCreationForm(ModelForm):
         fields = ['destination', 'date', 'passengers', 'ticket_price', 'lunch', 'luggage']
 
         widget = {
-            'date': DateInput(attrs={'type': 'date'})
+            'date': DateInput(attrs={'type': 'date'}),
+            'lunch': CheckboxSelectMultiple,
+            'luggage': CheckboxSelectMultiple
         }

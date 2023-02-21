@@ -67,7 +67,6 @@ class FlightsView(TemplateView):
 
 
 class LunchOptionsView(CreateView):
-
     def get(self, request):
         context = {
             'options': LunchOptions.objects.all(),
@@ -84,7 +83,6 @@ class LunchOptionsView(CreateView):
 
 
 class LunchOptionsDeleteView(DeleteView):
-
     def get(self, request, pk):
         lunch = LunchOptions.objects.get(id=pk)
         lunch.delete()
@@ -92,7 +90,6 @@ class LunchOptionsDeleteView(DeleteView):
 
 
 class LuggageOptionsView(CreateView):
-
     def get(self, request):
         context = {
             'options': LuggageOptions.objects.all(),
@@ -109,7 +106,6 @@ class LuggageOptionsView(CreateView):
 
 
 class LuggageOptionsDeleteView(DeleteView):
-
     def get(self, request, pk):
         luggage = LuggageOptions.objects.get(id=pk)
         luggage.delete()

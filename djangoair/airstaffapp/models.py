@@ -26,6 +26,15 @@ class LuggageOptions(models.Model):
         return '{}, price {}$'.format(self.get_quantity_display(), self.price)
 
 
+class FlightDate(models.Model):
+    date = models.DateField(auto_now=False, auto_now_add=False)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return self.date
+
+
 class Flight(models.Model):
     destinations = (
         ('lisbon', 'Lisbon, Portugal'),
@@ -42,11 +51,11 @@ class Flight(models.Model):
         ('palermo', 'Palermo, Italy')
     )
     destination = models.CharField(max_length=500, choices=destinations)
-    date = models.DateField(auto_now=False, auto_now_add=False)
+    date = models.ForeignKey(FlightDate, on_delete=models.CASCADE, related_name='flight_date')
     passengers = models.IntegerField(blank=False, null=False)
     ticket_price = models.IntegerField(blank=False, null=False)
-    lunch = models.ManyToManyField(LunchOptions, related_name='lunch')
-    luggage = models.ManyToManyField(LuggageOptions, related_name='luggage')
+    lunch = models.ManyToManyField(LunchOptions, related_name='lunch_pool')
+    luggage = models.ManyToManyField(LuggageOptions, related_name='luggage_pool')
 
     # is_completed = models.BooleanField(default=False)
     is_canceled = models.BooleanField(default=False)

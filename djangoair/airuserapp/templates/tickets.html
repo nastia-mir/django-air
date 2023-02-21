@@ -1,0 +1,33 @@
+{% extends  "main.html" %}
+{% block content %}
+
+<form method="POST" id="ticketForm" date-url="{% url 'passengers:ajax load dates' %}" novalidate>
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Proceed"/>
+</form>
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $("#id_destination").change(function () {
+      var url = $("#ticketForm").attr("date-url");
+      var destination = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'destination': destination
+        },
+        success: function (data) {
+          $("#id_date").html(data);
+        }
+      });
+
+    });
+  </script>
+
+{% endblock %}
+
+
