@@ -25,15 +25,7 @@ class TicketForm(ModelForm):
     widgets = {'date': ChoiceField()}
 
 
-
-
-'''class DestinationForm(ModelForm):
+class TicketOptionsForm(ModelForm):
     class Meta:
-        model = Flight
-        fields = ['destination']
-
-
-class DateQuantityForm(ModelForm):
-    class Meta:
-        model = Flight
-        fields = ['date', 'passengers']'''
+        model = Ticket
+        fields = ['lunch', 'luggage']

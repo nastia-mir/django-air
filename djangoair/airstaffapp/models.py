@@ -64,6 +64,6 @@ class Flight(models.Model):
 
     def __str__(self):
         if self.is_canceled:
-            return 'Destination: {}; date: {}. Canceled.'.format(self.get_destination_display(), self.date.date)
+            return '{}, {}. Canceled.'.format(self.get_destination_display(), self.date.date)
         else:
-            return 'Destination: {}; date: {}.'.format(self.get_destination_display(), self.date.date)
+            return '{}, {}.'.format(self.get_destination_display(), self.date.date)

@@ -3,8 +3,8 @@ from django.views import View
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
-from airuserapp.forms import TicketForm
-from airstaffapp.models import Flight, FlightDate
+from airuserapp.forms import TicketForm, TicketOptionsForm
+from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airuserapp.models import Ticket
 
 
@@ -12,7 +12,7 @@ class HomeView(TemplateView):
     template_name = "home_user.html"
 
 
-class SearchTicketsView(View):
+class SearchTicketsView(CreateView):
     def get(self, request):
         context = {'form': TicketForm}
         return render(request, 'tickets.html', context)
@@ -30,7 +30,7 @@ class SearchTicketsView(View):
             return redirect(reverse('passengers:ticket details'))
         else:
             messages.error(request, 'No tickets available. Please, choose another flight.')
-            return redirect('tickets')
+            return redirect('passengers:tickets')
 
 
 #ajax
@@ -43,7 +43,40 @@ def load_dates(request):
 
 
 class TicketDetailsView(UpdateView):
+    template_name = 'ticket_details.html'
+    model = Ticket
+    fields = ['lunch', 'luggage']
+
+    def get_context_data(self):
+        context = super(TicketDetailsView, self).get_context_data()
+        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        context['ticket_price'] = ticket.flight.ticket_price * ticket.tickets_quantity
+        context['lunch_options'] = ticket.flight.lunch.all()
+        context['luggage_options'] = ticket.flight.luggage.all()
+        context['ticket'] = ticket
+        context['options_form'] = TicketOptionsForm
+        return context
+
+    def post(self, request, pk):
+        #lunch = request.POST.get('lunch')
+        #luggage = request.POST.get('luggage')
+        options_form = TicketOptionsForm(request.POST)
+        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        if options_form.is_valid():
+            options = options_form.save(commit=False)
+            print(options.lunch, options.luggage)
+            #print(luggage.split(','), LuggageOptions.objects.choices_display_to_value(luggage.split(',')))
+            #ticket.lunch = LunchOptions.objects.get(description=lunch.split(','))
+            #ticket.luggage = LuggageOptions.objects.get(quantity=luggage.split(','))
+            ticket.lunch = options.lunch
+            ticket.luggage = options.luggage
+            ticket.save()
+        return redirect(reverse('passengers:ticket booking', args={pk}))
+
+
+class TicketBookingView(UpdateView):
     pass
+
 
 
 
