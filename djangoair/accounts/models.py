@@ -19,8 +19,8 @@ class MyUserManager(BaseUserManager):
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=254, unique=True)
-    first_name = models.CharField(max_length=200, default="Unknown")
-    last_name = models.CharField(max_length=200, default="Unknown")
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
     is_airlines_staff = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
