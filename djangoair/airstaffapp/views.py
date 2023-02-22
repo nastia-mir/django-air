@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
+from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, ListView
 from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
@@ -130,7 +130,10 @@ class CreateFlightView(CreateView):
             date, created = FlightDate.objects.get_or_create(date=flight_date.date)
             flight = flight_form.save(commit=False)
             flight.date = date
+
             flight.save()
+            flight_form.save_m2m()
+            print(flight.lunch)
             return redirect(reverse('staff:flights'))
 
 
@@ -168,6 +171,17 @@ class CancelFlightView(UpdateView):
             return redirect(reverse('staff:flights'))
         except:
             return redirect(reverse('staff:flights'))
+
+
+class CanceledFLightsListView(ListView):
+    template_name = 'canceled_flights_list.html'
+    queryset = Flight.objects.filter(is_canceled=True).order_by('date')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CanceledFLightsListView, self).get_context_data()
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        return context
+
 
 
 

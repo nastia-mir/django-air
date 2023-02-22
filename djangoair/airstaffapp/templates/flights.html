@@ -11,13 +11,11 @@
 
 {% for flight in flights %}
 
-
+{% if not flight.is_canceled %}
 
 <p>
     <a href="{% url 'staff:flight details' flight.id %}">{{flight}}</a>
 </p>
-
-{% if not flight.is_canceled %}
 
 <p>
     <a href="{% url 'staff:cancel flight' flight.id %}">Cancel flight</a>
@@ -27,6 +25,9 @@
 
 {% endfor %}
 {% endif %}
+
+
+<a href="{% url 'staff:canceled flights' %}">View canceled flights.</a>
 
 {% else %}
 <h2>Only supervisors can access this page.</h2>
