@@ -4,7 +4,7 @@
 {% if request_user_role == 'supervisor' %}
 
 <p>Destination: {{flight.get_destination_display}}</p>
-<p>Date: {{flight.date}}</p>
+<p>Date: {{flight.date.date}}</p>
 <p>Passengers allowed: {{flight.passengers}}</p>
 <p>Ticket price: {{flight.ticket_price}}$</p>
 

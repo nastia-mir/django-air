@@ -32,7 +32,7 @@ class FlightDate(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return self.date
+        return str(self.date)
 
 
 class Flight(models.Model):
@@ -64,6 +64,6 @@ class Flight(models.Model):
 
     def __str__(self):
         if self.is_canceled:
-            return 'Destination: {}; date: {}. Canceled.'.format(self.get_destination_display(), self.date)
+            return 'Destination: {}; date: {}. Canceled.'.format(self.get_destination_display(), self.date.date)
         else:
-            return 'Destination: {}; date: {}'.format(self.get_destination_display(), self.date)
+            return 'Destination: {}; date: {}.'.format(self.get_destination_display(), self.date.date)

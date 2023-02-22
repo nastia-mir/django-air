@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
 
-from airstaffapp.models import Flight, LunchOptions, LuggageOptions
-from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm
+from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
+from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm, DateForm
 
 
 class HomeView(TemplateView):
@@ -117,14 +117,20 @@ class CreateFlightView(CreateView):
     def get(self, request):
         context = {
             'request_user_role': Staff.objects.get(user=request.user).role,
-            'form': FlightCreationForm
+            'flight_form': FlightCreationForm,
+            'date_form': DateForm
         }
         return render(request, 'create_flight.html', context)
 
     def post(self, request):
-        form = FlightCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
+        flight_form = FlightCreationForm(request.POST)
+        date_form = DateForm(request.POST)
+        if flight_form.is_valid() and date_form.is_valid():
+            flight_date = date_form.save(commit=False)
+            date, created = FlightDate.objects.get_or_create(date=flight_date.date)
+            flight = flight_form.save(commit=False)
+            flight.date = date
+            flight.save()
             return redirect(reverse('staff:flights'))
 
 
