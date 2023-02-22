@@ -22,7 +22,7 @@ class SearchTicketsView(View):
 #ajax
 def load_dates(request):
     destination = request.GET.get('destination')
-    flights = list(Flight.objects.filter(destination=destination))
+    flights = list(Flight.objects.filter(destination=destination, is_canceled=False))
     dates = [flight.date for flight in flights]
     context = {'dates': dates}
     return render(request, 'dates_dropdown.html', context)

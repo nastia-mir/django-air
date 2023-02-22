@@ -130,10 +130,8 @@ class CreateFlightView(CreateView):
             date, created = FlightDate.objects.get_or_create(date=flight_date.date)
             flight = flight_form.save(commit=False)
             flight.date = date
-
             flight.save()
             flight_form.save_m2m()
-            print(flight.lunch)
             return redirect(reverse('staff:flights'))
 
 
