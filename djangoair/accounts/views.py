@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, UpdateView
 from django.views.generic.edit import ProcessFormView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -8,8 +8,11 @@ from accounts.forms import MyUserCreationForm
 from accounts.models import MyUser, Staff, Passenger
 
 
-class LoginView(ProcessFormView):
+class HomeView(TemplateView):
+    template_name = "home.html"
 
+
+class LoginView(ProcessFormView):
     def post(self, request):
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -61,5 +64,5 @@ class LogoutView(ProcessFormView):
         return redirect('accounts:home')
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
+class RestorePasswordView(UpdateView):
+    pass

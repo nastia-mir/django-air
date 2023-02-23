@@ -3,8 +3,13 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm
-from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airuserapp.models import Ticket
+
+from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
+
+from accounts.forms import PassengerForm
+from accounts.models import MyUser, Passenger
+from accounts.services import PasswordGenerator
 
 
 class HomeView(TemplateView):
@@ -25,8 +30,9 @@ class SearchTicketsView(CreateView):
         flight = Flight.objects.get(destination=destination, date=date)
         sold_tickets = len(Ticket.objects.filter(flight=flight).all())
         if int(passengers) <= flight.passengers-sold_tickets:
-            Ticket.objects.create(flight=flight, tickets_quantity=passengers)
-            return redirect(reverse('passengers:ticket details'))
+            ticket = Ticket.objects.create(flight=flight, tickets_quantity=passengers)
+
+            return redirect(reverse('passengers:ticket details', args={ticket.id}))
         else:
             messages.error(request, 'No tickets available. Please, choose another flight.')
             return redirect('passengers:tickets')
@@ -71,7 +77,40 @@ class TicketDetailsView(UpdateView):
 
 
 class TicketBookingView(UpdateView):
-    pass
+
+    def get(self, request, pk):
+        context = {'form': PassengerForm}
+        ticket = Ticket.objects.get(id=pk)
+        context['ticket'] = ticket
+        total_price = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
+        context['total_price'] = total_price
+        if request.user.is_authenticated and not request.user.is_airlines_staff:
+            context['user'] = request.user
+        else:
+            context['user'] = None
+        return render(request, 'ticket_booking.html', context)
+
+    def post(self, request, pk):
+        email_form = PassengerForm(request.POST)
+        ticket = Ticket.objects.get(id=pk)
+        if email_form.is_valid():
+            email = email_form.cleaned_data['email']
+            try:
+                existing_user = MyUser.objects.get(email=email)
+                existing_passenger, created = Passenger.objects.get_or_create(user=existing_user)
+                ticket.passenger = existing_passenger
+                ticket.save()
+            except:
+                password = PasswordGenerator.generate_password()
+                user = MyUser.objects.create_user(email=email, password=password)
+                passenger_account = Passenger.objects.create(user=user)
+                passenger_account.save()
+        else:
+            messages.error(request, 'Please enter valid email')
+            return redirect(reverse('passengers:ticket booking', args={pk}))
+
+        return redirect(reverse('passengers:home'))
+
 
 
 

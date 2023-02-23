@@ -19,8 +19,8 @@ class MyUserManager(BaseUserManager):
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=254, unique=True)
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=200, blank=True)
+    last_name = models.CharField(max_length=200, blank=True)
     is_airlines_staff = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
@@ -30,7 +30,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     objects = MyUserManager()
 
     def __str__(self):
-        return '{} {}'.format(self.first_name, self.last_name)
+        return '{} {}, email: {}'.format(self.first_name, self.last_name, self.email)
 
 
 class Passenger(models.Model):

@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h3>Last steps</h3>
+
+<p>Your tickets:</p>
+
+<p>Flight: {{ticket.flight}}</p>
+<p>Quantity: {{ticket.tickets_quantity}}</p>
+<p>Price (per ticket): {{ticket.flight.ticket_price}}$</p>
+<p>Lunch: {{ticket.lunch}}</p>
+<p>Luggage: {{ticket.luggage}}</p>
+
+<br/>
+<p>Total price: {{total_price}}$</p>
+<br/>
+
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <p>You will receive your tickets via email.</p>
+    <input type="submit" value="Book tickets"/>
+</form>
+
+
+{% endblock %}
