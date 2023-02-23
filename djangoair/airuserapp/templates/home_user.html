@@ -1,18 +1,27 @@
 {% extends  "main.html" %}
 {% block content %}
 
-
+<br/>
 <a href="{% url 'passengers:tickets' %}">Book tickets</a>
 
 {% if request.user.is_authenticated %}
 
-<p>Here will be your personal cabinet.</p>
+{% if tickets|length != 0 %}
+
+{% for ticket in tickets %}
+<p>{{ticket}}</p>
+{% endfor %}
+
+{% else %}
+<p>You don't have any tickets yet.</p>
+{% endif %}
+
 
 {% else %}
 
 <p>
     Already have account?
-    <a href="{% url 'accounts:login' %}">login</a>
+    <a href="{% url 'accounts:login' %}">Login</a>
     to view detail information on your flight in personal cabinet.
 </p>
 

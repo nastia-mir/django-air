@@ -4,6 +4,7 @@ from django.contrib import messages
 
 from airuserapp.forms import TicketForm
 from airuserapp.models import Ticket
+from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 
@@ -14,6 +15,16 @@ from accounts.services import PasswordGenerator
 
 class HomeView(TemplateView):
     template_name = "home_user.html"
+
+    def get_context_data(self):
+        context = super(HomeView, self).get_context_data()
+        if self.request.user.is_authenticated:
+            try:
+                passenger = Passenger.objects.get(user=self.request.user)
+                context['tickets'] = Ticket.objects.filter(passenger=passenger)
+            except:
+                context['tickets'] = None
+            return context
 
 
 class SearchTicketsView(CreateView):
@@ -31,7 +42,6 @@ class SearchTicketsView(CreateView):
         sold_tickets = len(Ticket.objects.filter(flight=flight).all())
         if int(passengers) <= flight.passengers-sold_tickets:
             ticket = Ticket.objects.create(flight=flight, tickets_quantity=passengers)
-
             return redirect(reverse('passengers:ticket details', args={ticket.id}))
         else:
             messages.error(request, 'No tickets available. Please, choose another flight.')
@@ -105,6 +115,8 @@ class TicketBookingView(UpdateView):
                 user = MyUser.objects.create_user(email=email, password=password)
                 passenger_account = Passenger.objects.create(user=user)
                 passenger_account.save()
+                Emails.send_temporary_password(request, email, password)
+
         else:
             messages.error(request, 'Please enter valid email')
             return redirect(reverse('passengers:ticket booking', args={pk}))

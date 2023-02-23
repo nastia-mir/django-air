@@ -23,7 +23,6 @@ class LoginView(ProcessFormView):
             messages.error(request, 'User does not exist.')
 
         user = authenticate(request, email=email, password=password)
-        login(request, user)
         if user is not None:
             login(request, user)
             return redirect('accounts:home')
