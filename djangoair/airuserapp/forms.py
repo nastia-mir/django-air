@@ -1,6 +1,6 @@
-from django.forms import ModelForm, Form, CharField, DateField, ChoiceField
+from django.forms import ModelForm, ChoiceField
 
-from airstaffapp.models import Flight
+from airstaffapp.models import Flight, LuggageOptions, LunchOptions
 from airuserapp.models import Ticket
 
 
@@ -19,13 +19,5 @@ class TicketForm(ModelForm):
                 self.fields['date'].queryset = Flight.objects.filter(destination=destination).order_by('date')
             except (ValueError, TypeError):
                 pass
-        # elif self.instance.pk:
-        #    self.fields['data'].queryset = self.instance.flight.city_set.order_by('date')
 
     widgets = {'date': ChoiceField()}
-
-
-class TicketOptionsForm(ModelForm):
-    class Meta:
-        model = Ticket
-        fields = ['lunch', 'luggage']

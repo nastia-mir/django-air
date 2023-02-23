@@ -1,5 +1,4 @@
 {% extends 'main.html' %}
-
 {% block content %}
 
 <h3>{{ticket.flight}}</h3>
@@ -10,12 +9,12 @@
 
 <form method="POST">
     {% csrf_token %}
-    <p>
-        {# <label for="lunch-select">Choose lunch:</label>
+   <p>
+        <label for="lunch-select">Choose lunch:</label>
 
         <select name="lunch" class="form-control" id="lunch-select">
             {% for lunch in lunch_options %}
-            <option value="{{ lunch }}">{{ lunch }}</option>
+            <option name="{{ lunch.id }}">{{ lunch }}</option>
             {% endfor %}
         </select>
     </p>
@@ -27,16 +26,7 @@
             <option value="{{ luggage }}">{{ luggage }}</option>
             {% endfor %}
         </select>
-    </p> #}
-
-
-
-<form method="POST">
-    {% csrf_token %}
-    {{options_form.as_p}}
-    <input type="submit" value="Proceed"/>
-</form>
-
+    </p>
 
     <input type="submit" value="Proceed"/>
 </form>

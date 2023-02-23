@@ -1,9 +1,8 @@
-from django.views.generic import TemplateView, UpdateView, CreateView, FormView
-from django.views import View
+from django.views.generic import TemplateView, UpdateView, CreateView
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
-from airuserapp.forms import TicketForm, TicketOptionsForm
+from airuserapp.forms import TicketForm
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airuserapp.models import Ticket
 
@@ -54,23 +53,20 @@ class TicketDetailsView(UpdateView):
         context['lunch_options'] = ticket.flight.lunch.all()
         context['luggage_options'] = ticket.flight.luggage.all()
         context['ticket'] = ticket
-        context['options_form'] = TicketOptionsForm
         return context
 
     def post(self, request, pk):
-        #lunch = request.POST.get('lunch')
-        #luggage = request.POST.get('luggage')
-        options_form = TicketOptionsForm(request.POST)
+        lunch = request.POST.get('lunch')
+        luggage = request.POST.get('luggage')
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
-        if options_form.is_valid():
-            options = options_form.save(commit=False)
-            print(options.lunch, options.luggage)
-            #print(luggage.split(','), LuggageOptions.objects.choices_display_to_value(luggage.split(',')))
-            #ticket.lunch = LunchOptions.objects.get(description=lunch.split(','))
-            #ticket.luggage = LuggageOptions.objects.get(quantity=luggage.split(','))
-            ticket.lunch = options.lunch
-            ticket.luggage = options.luggage
-            ticket.save()
+        ticket.lunch = LunchOptions.objects.get(description=lunch.split(',')[0])
+        luggage_options = {
+            'No luggage': '0',
+            'One luggage': '1',
+            'Two luggage': '2'
+        }
+        ticket.luggage = LuggageOptions.objects.get(quantity=luggage_options[luggage.split(',')[0]])
+        ticket.save()
         return redirect(reverse('passengers:ticket booking', args={pk}))
 
 
