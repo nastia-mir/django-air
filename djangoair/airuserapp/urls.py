@@ -10,4 +10,9 @@ urlpatterns = [
 
     path('ajax/load_dates/', views.load_dates, name='ajax load dates'),
 
+    path('view_ticket/<pk>/', views.ViewTicketView.as_view(), name='view ticket'),
+    path('checkin/<pk>/', views.CheckInView.as_view(), name='checkin'),
+
+
+
 ]

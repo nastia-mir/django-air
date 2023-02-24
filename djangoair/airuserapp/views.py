@@ -14,7 +14,7 @@ from accounts.services import PasswordGenerator
 
 
 class HomeView(TemplateView):
-    template_name = "home_user.html"
+    template_name = "home_passenger.html"
 
     def get_context_data(self):
         context = super(HomeView, self).get_context_data()
@@ -125,6 +125,24 @@ class TicketBookingView(UpdateView):
             return redirect(reverse('passengers:ticket booking', args={pk}))
 
         return redirect(reverse('passengers:home'))
+
+
+class ViewTicketView(TemplateView):
+    template_name = 'view_ticket.html'
+
+    def get_context_data(self, pk):
+        context = super(ViewTicketView, self).get_context_data()
+        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        context['ticket'] = ticket
+        return context
+
+
+class CheckInView(UpdateView):
+    pass
+
+
+
+
 
 
 

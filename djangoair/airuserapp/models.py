@@ -11,6 +11,8 @@ class Ticket(models.Model):
     lunch = models.ForeignKey(LunchOptions, on_delete=models.CASCADE, related_name='lunch', null=True)
     luggage = models.ForeignKey(LuggageOptions, on_delete=models.CASCADE, related_name='luggage', null=True)
 
+    check_in = models.BooleanField(default=False)
+
     objects = models.Manager()
 
     def __str__(self):

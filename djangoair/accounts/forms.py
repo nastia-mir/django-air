@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import Form, EmailField
+from django.forms import Form, EmailField, ModelForm
 from accounts.models import MyUser
 
 
@@ -10,6 +10,12 @@ class MyUserCreationForm(UserCreationForm):
 
 
 class PassengerForm(Form):
-    email = EmailField(max_length = 200)
+    email = EmailField(max_length=200)
+
+
+class EditProfileForm(ModelForm):
+    class Meta:
+        model = MyUser
+        fields = ['first_name', 'last_name']
 
 

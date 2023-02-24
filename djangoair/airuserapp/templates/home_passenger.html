@@ -3,19 +3,25 @@
 
 <br/>
 <a href="{% url 'passengers:tickets' %}">Book tickets</a>
+<br/>
 
 {% if request.user.is_authenticated %}
 
 {% if tickets|length != 0 %}
 
 {% for ticket in tickets %}
-<p>{{ticket}}</p>
+<p>
+    <a href="{% url 'passengers:view ticket' ticket.id %}">{{ticket}}</a>
+</p>
 {% endfor %}
 
 {% else %}
 <p>You don't have any tickets yet.</p>
 {% endif %}
 
+<br/>
+
+<a href="{% url 'accounts:edit profile' %}">Edit profile</a>
 
 {% else %}
 

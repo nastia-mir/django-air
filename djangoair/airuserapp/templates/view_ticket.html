@@ -1,0 +1,30 @@
+{% extends  "main.html" %}
+{% block content %}
+
+{% if request.user.is_authenticated %}
+
+<p>Your tickets:</p>
+
+<p>
+    Flight: {{ticket.flight}}
+    {% if ticket.flight.is_canceled %}
+    Canceled.
+    {% endif %}
+</p>
+<p>Quantity: {{ticket.tickets_quantity}}</p>
+<p>Price (per ticket): {{ticket.flight.ticket_price}}$</p>
+<p>Lunch: {{ticket.lunch}}</p>
+<p>Luggage: {{ticket.luggage}}</p>
+
+
+{% if not ticket.check_in %}
+<a href="{% url 'passengers:checkin' ticket.id %}">Check in</a>
+{% else %}
+<p>Check in completed.</p>
+{% endif %}
+
+{% else %}
+<h2>You need to login to view you tickets details.</h2>
+{% endif %}
+
+{% endblock %}

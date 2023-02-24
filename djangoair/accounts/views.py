@@ -2,9 +2,9 @@ from django.views.generic import TemplateView, FormView, UpdateView
 from django.views.generic.edit import ProcessFormView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 
-from accounts.forms import MyUserCreationForm
+from accounts.forms import MyUserCreationForm, EditProfileForm
 from accounts.models import MyUser, Staff, Passenger
 
 
@@ -61,6 +61,25 @@ class LogoutView(ProcessFormView):
     def get(self, request):
         logout(request)
         return redirect('passengers:home')
+
+
+class EditProfileView(ProcessFormView):
+    def get(self, request):
+        context = {'form': EditProfileForm}
+        return render(request, 'edit_profile.html', context)
+
+    def post(self, request):
+        form = EditProfileForm(request.POST)
+        if form.is_valid():
+            user_form = form.save(commit=False)
+            request.user.first_name = user_form.first_name
+            request.user.last_name = user_form.last_name
+            request.user.save()
+            return redirect('passengers:home')
+
+
+class ChangePasswordView(UpdateView):
+    pass
 
 
 class RestorePasswordView(UpdateView):
