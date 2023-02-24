@@ -1,7 +1,6 @@
-from django.forms import ModelForm, ChoiceField
+from django.forms import ModelForm, ChoiceField, Form, CharField
 
-from airstaffapp.models import Flight, LuggageOptions, LunchOptions
-from airuserapp.models import Ticket
+from airstaffapp.models import Flight
 
 
 class TicketForm(ModelForm):
@@ -21,3 +20,9 @@ class TicketForm(ModelForm):
                 pass
 
     widgets = {'date': ChoiceField()}
+
+
+class PassengerListForm(Form):
+    first_name = CharField(max_length=100)
+    last_name = CharField(max_length=100)
+

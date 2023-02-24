@@ -1,8 +1,9 @@
 from django.views.generic import TemplateView, UpdateView, CreateView
+from django.views.generic.edit import ProcessFormView
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
-from airuserapp.forms import TicketForm
+from airuserapp.forms import TicketForm, PassengerListForm
 from airuserapp.models import Ticket
 from airuserapp.services import Emails
 
@@ -92,7 +93,7 @@ class TicketBookingView(UpdateView):
         context = {'form': EmailForm}
         ticket = Ticket.objects.get(id=pk)
         context['ticket'] = ticket
-        total_price = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
+        total_price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
         context['total_price'] = total_price
         if request.user.is_authenticated and not request.user.is_airlines_staff:
             context['user'] = request.user
@@ -137,8 +138,10 @@ class ViewTicketView(TemplateView):
         return context
 
 
-class CheckInView(UpdateView):
-    pass
+class CheckInView(ProcessFormView):
+    def get(self, request):
+        context = {'form': PassengerListForm}
+
 
 
 

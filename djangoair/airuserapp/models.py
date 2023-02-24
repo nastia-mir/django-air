@@ -17,3 +17,16 @@ class Ticket(models.Model):
 
     def __str__(self):
         return '{}, {} tickets to {}'.format(self.passenger, self.tickets_quantity, self.flight)
+
+
+class BoardingPass(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='boarding_pass')
+    first_name = models.CharField(max_length=100, blank=False, null=False)
+    last_name = models.CharField(max_length=100, blank=False, null=False)
+    code = models.CharField(max_length=10, blank=False, null=False)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return '{}, {} {}'.format(self.code, self.first_name, self.last_name)
+
