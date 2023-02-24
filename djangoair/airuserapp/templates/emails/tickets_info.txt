@@ -1,0 +1,11 @@
+Your tickets:
+
+Flight: {{ticket.flight}}
+Quantity: {{ticket.tickets_quantity}}
+Price (per ticket): {{ticket.flight.ticket_price}}$
+Lunch: {{ticket.lunch}}
+Luggage: {{ticket.luggage}}
+
+Total price: {{total_price}}$
+
+Thank you for choosing Django Air!

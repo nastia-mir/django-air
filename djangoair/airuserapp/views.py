@@ -119,6 +119,7 @@ class TicketBookingView(UpdateView):
                 ticket.save()
                 Emails.send_temporary_password(request, email, password)
 
+            Emails.send_ticket_details(request, email, ticket)
         else:
             messages.error(request, 'Please enter valid email')
             return redirect(reverse('passengers:ticket booking', args={pk}))
