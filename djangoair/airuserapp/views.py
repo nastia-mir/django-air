@@ -8,7 +8,7 @@ from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 
-from accounts.forms import PassengerForm
+from accounts.forms import EmailForm
 from accounts.models import MyUser, Passenger
 from accounts.services import PasswordGenerator
 
@@ -89,7 +89,7 @@ class TicketDetailsView(UpdateView):
 class TicketBookingView(UpdateView):
 
     def get(self, request, pk):
-        context = {'form': PassengerForm}
+        context = {'form': EmailForm}
         ticket = Ticket.objects.get(id=pk)
         context['ticket'] = ticket
         total_price = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
@@ -101,7 +101,7 @@ class TicketBookingView(UpdateView):
         return render(request, 'ticket_booking.html', context)
 
     def post(self, request, pk):
-        email_form = PassengerForm(request.POST)
+        email_form = EmailForm(request.POST)
         ticket = Ticket.objects.get(id=pk)
         if email_form.is_valid():
             email = email_form.cleaned_data['email']

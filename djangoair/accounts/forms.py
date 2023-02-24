@@ -9,7 +9,7 @@ class MyUserCreationForm(UserCreationForm):
         fields = ['email', 'first_name', 'last_name', 'password1', 'password2', 'is_airlines_staff']
 
 
-class PassengerForm(Form):
+class EmailForm(Form):
     email = EmailField(max_length=200)
 
 

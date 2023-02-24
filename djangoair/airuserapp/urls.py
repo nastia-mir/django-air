@@ -1,4 +1,6 @@
 from django.urls import path
+from django.contrib.auth.decorators import login_required
+
 from airuserapp import views
 
 urlpatterns = [
@@ -10,8 +12,8 @@ urlpatterns = [
 
     path('ajax/load_dates/', views.load_dates, name='ajax load dates'),
 
-    path('view_ticket/<pk>/', views.ViewTicketView.as_view(), name='view ticket'),
-    path('checkin/<pk>/', views.CheckInView.as_view(), name='checkin'),
+    path('view_ticket/<pk>/', login_required(views.ViewTicketView.as_view()), name='view ticket'),
+    path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin'),
 
 
 
