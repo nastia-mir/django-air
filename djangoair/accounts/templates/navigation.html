@@ -7,8 +7,12 @@
 <a href="{% url 'staff:home' %}">Staff interface</a>
 {% endif %}
 
-
+{% if request.user.first_name %}
 <h3>Welcome, {{request.user.first_name}}</h3>
+{% else %}
+<h3>Welcome</h3>
+{% endif %}
+
 
 {% else %}
 

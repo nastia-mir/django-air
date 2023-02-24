@@ -38,7 +38,7 @@ class SearchTicketsView(CreateView):
 
         passengers = request.POST.get('passengers')
 
-        flight = Flight.objects.get(destination=destination, date=date)
+        flight = Flight.objects.get(destination=destination, date=date, is_canceled=False)
         sold_tickets = len(Ticket.objects.filter(flight=flight).all())
         if int(passengers) <= flight.passengers-sold_tickets:
             ticket = Ticket.objects.create(flight=flight, tickets_quantity=passengers)
@@ -115,6 +115,8 @@ class TicketBookingView(UpdateView):
                 user = MyUser.objects.create_user(email=email, password=password)
                 passenger_account = Passenger.objects.create(user=user)
                 passenger_account.save()
+                ticket.passenger = passenger_account
+                ticket.save()
                 Emails.send_temporary_password(request, email, password)
 
         else:

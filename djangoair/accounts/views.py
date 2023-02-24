@@ -25,7 +25,7 @@ class LoginView(ProcessFormView):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('accounts:home')
+            return redirect('passengers:home')
         else:
             messages.error(request, 'Wrong email or password.')
             return redirect('accounts:login')
@@ -60,7 +60,7 @@ class RegisterView(FormView):
 class LogoutView(ProcessFormView):
     def get(self, request):
         logout(request)
-        return redirect('accounts:home')
+        return redirect('passengers:home')
 
 
 class RestorePasswordView(UpdateView):
