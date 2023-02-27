@@ -1,7 +1,5 @@
 from django.db import models
 
-from airuserapp.models import Ticket
-
 
 class LunchOptions(models.Model):
     description = models.CharField(max_length=500)
@@ -70,18 +68,5 @@ class Flight(models.Model):
             return '{}, {}.'.format(self.get_destination_display(), self.date.date)
 
 
-class CheckIn(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket')
-    passenger_list = models.TextField(max_length=1000, null=True, blank=True)
-    status_choices = (
-        ('in_progress', 'In progress'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected')
-    )
-    status = models.CharField(max_length=100, choices=status_choices)
 
-    objects = models.Manager()
-
-    def __str__(self):
-        return '{}, status: {}'.format(self.ticket, self.get_status_display())
 
