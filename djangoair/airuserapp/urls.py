@@ -14,7 +14,7 @@ urlpatterns = [
 
     path('view_ticket/<pk>/', login_required(views.ViewTicketView.as_view()), name='view ticket'),
     path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin'),
-    path('checkin/<pk>/delete_passenger/<passenger_pk>/', login_required(views.DeleteFromCheckin.as_view()), name='delete passenger')
+    path('checkin/delete/<pk>/', login_required(views.DeleteFromCheckin.as_view()), name='delete checkin')
 
 
 

@@ -3,17 +3,14 @@
 
 {% if request_user_role == 'supervisor' %}
 
-{% for flight in object_list  %}
-
-<p>
-    <a href="{% url 'staff:flight details' flight.id %}">{{flight}}</a>
-</p>
-
-{% endfor %}
-
+    {% for flight in object_list  %}
+    <p>
+        <a href="{% url 'staff:flight details' flight.id %}">{{flight}}</a>
+    </p>
+    {% endfor %}
 
 {% else %}
-<h2>Only supervisors can access this page.</h2>
+    <h2>Only supervisors can access this page.</h2>
 {% endif %}
 
 {% endblock %}

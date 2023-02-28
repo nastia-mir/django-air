@@ -142,54 +142,55 @@ class CheckInView(ProcessFormView):
     def get(self, request, pk):
         context = {}
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
-        context['ticket'] = ticket
-        checkin, created = CheckIn.objects.get_or_create(ticket=ticket)
-        if not created and checkin.passengers.all():
-            context['passengers'] = checkin.passengers.all()
-            if checkin.passengers.count() < ticket.tickets_quantity:
-                context['form'] = CheckInForm
-                context['left'] = ticket.tickets_quantity - checkin.passengers.count()
-            elif checkin.passengers.count() == ticket.tickets_quantity:
-                context['form'] = None
-                context['left'] = 0
-            else:
-                context['form'] = None
-                context['left'] = -1
-
+        if ticket.check_in == 'waiting_for_approval' or ticket.check_in == 'completed':
+            context['check_in'] = True
         else:
-            context['passengers'] = None
-            context['form'] = CheckInForm
-            context['left'] = ticket.tickets_quantity
+            context['ticket'] = ticket
+            checkins = list(CheckIn.objects.filter(ticket=ticket))
+            if checkins:
+                context['passengers'] = checkins
+                if len(checkins) < ticket.tickets_quantity:
+                    context['form'] = CheckInForm
+                    context['left'] = ticket.tickets_quantity - len(checkins)
+                elif len(checkins) == ticket.tickets_quantity:
+                    context['form'] = None
+                    context['left'] = 0
+                else:
+                    context['form'] = None
+                    context['left'] = -1
 
-        return render(request, 'passenger_checkin.html', context)
+            else:
+                context['passengers'] = None
+                context['form'] = CheckInForm
+                context['left'] = ticket.tickets_quantity
+
+            return render(request, 'passenger_checkin.html', context)
 
     def post(self, request, pk):
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
-        checkin = CheckIn.objects.get(ticket=ticket)
         if 'add_passenger' in request.POST:
             form = CheckInForm(request.POST)
             if form.is_valid():
-                name_form = form.save(commit=False)
-                print(name_form)
-                name_form.save()
-                checkin.passengers.add(name_form)
-                return redirect(reverse('passengers:checkin', args={pk}))
+                checkin_form = form.save(commit=False)
+                checkin_form.ticket = ticket
+                checkin_form.save()
+                if ticket.check_in != 'editing':
+                    ticket.check_in = 'editing'
+                    ticket.save()
+            else:
+                messages.error(request, 'Please enter valid data.')
+            return redirect(reverse('passengers:checkin', args={pk}))
         elif 'checkin' in request.POST:
-            checkin.status = 'in_progress'
-            checkin.save()
-            ticket.check_in = True
+            ticket.check_in = 'waiting_for_approval'
             ticket.save()
             return redirect(reverse('passengers:view ticket', args={pk}))
 
 
 class DeleteFromCheckin(DeleteView):
-    def get(self, request, pk, passenger_pk):
-        '''ticket = Ticket.objects.get(id=self.kwargs['pk'])
-        checkin = CheckIn.objects.get(ticket=ticket)
-        passenger = PassengerName.objects.get(id=self.kwargs['passenger_pk'])
-        checkin.passengers.remove(passenger)
-        return redirect(reverse('passengers:checkin', args={pk}))'''
-        pass
+    def get(self, request, pk):
+        checkin = CheckIn.objects.get(id=self.kwargs['pk'])
+        checkin.delete()
+        return redirect(reverse('passengers:checkin', args={checkin.ticket.id}))
 
 
 

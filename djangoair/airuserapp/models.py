@@ -11,7 +11,13 @@ class Ticket(models.Model):
     lunch = models.ForeignKey(LunchOptions, on_delete=models.CASCADE, related_name='lunch', null=True)
     luggage = models.ForeignKey(LuggageOptions, on_delete=models.CASCADE, related_name='luggage', null=True)
 
-    check_in = models.BooleanField(default=False)
+    checkin_options = (
+        ('no_checkin', 'No check-in'),
+        ('editing', 'Editing'),  # check-in requests not for all passengers from ticket
+        ('waiting_for_approval', 'Waiting for approval'),
+        ('completed', 'Completed')
+    )
+    check_in = models.CharField(max_length=150, choices=checkin_options, default='no_checkin')
 
     objects = models.Manager()
 
@@ -29,7 +35,7 @@ class CheckIn(models.Model):
         ('completed', 'Completed'),
         ('rejected', 'Rejected')
     )
-    status = models.CharField(max_length=100, choices=status_choices, blank=True)
+    status = models.CharField(max_length=100, choices=status_choices, default='in_progress')
 
     objects = models.Manager()
 
