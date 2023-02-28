@@ -1,10 +1,15 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, ListView
+from django.views.generic.edit import ProcessFormView
 from django.shortcuts import render, redirect, reverse
 
 from accounts.models import Staff
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm, DateForm
+from airstaffapp.services import CreateBoardingPass
+
+from airuserapp.models import CheckIn, BoardingPass
+from airuserapp.services import Emails
 
 
 class HomeView(TemplateView):
@@ -179,6 +184,56 @@ class CanceledFLightsListView(ListView):
         context = super(CanceledFLightsListView, self).get_context_data()
         context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
+
+
+class CheckInListView(ListView):
+    template_name = 'checkin_list.html'
+    queryset = CheckIn.objects.filter(status='in_progress')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CheckInListView, self).get_context_data()
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        return context
+
+
+class CheckInView(ProcessFormView):
+    def get(self, request, pk):
+        checkin = CheckIn.objects.get(id=pk)
+        context = {'checkin': checkin,
+                   'extra_luggage_price': checkin.ticket.flight.extra_luggage_price * checkin.extra_luggage,
+                   'request_user_role': Staff.objects.get(user=self.request.user).role}
+        return render(request, 'checkin.html', context)
+
+    def post(self, request, pk):
+        checkin = CheckIn.objects.get(id=pk)
+        checkin.status = 'completed'
+        checkin.save()
+        CreateBoardingPass.create_boarding_pass(checkin)
+        try:
+            no_checkin = CheckIn.objects.get(ticket=checkin.ticket, status='in_progress').first()
+        except:
+            checkin.ticket.check_in = 'completed'
+            checkin.ticket.save()
+            boarding_passes_list = list(BoardingPass.objects.filter(ticket=checkin.ticket).all())
+            email = checkin.ticket.passenger.user.email
+            Emails.send_boarding_pass(request, boarding_passes_list, email)
+
+            extra_luggage = []
+            for boarding_pass in boarding_passes_list:
+                if boarding_pass.extra_luggage != 0:
+                    extra_luggage_dict = {'passenger': '{} {}'.format(boarding_pass.passenger_first_name,
+                                                                      boarding_pass.passenger_first_name),
+                                          'extra_luggage': boarding_pass.extra_luggage,
+                                          'price': boarding_pass.ticket.flight.extra_luggage_price * boarding_pass.extra_luggage}
+                    extra_luggage.append(extra_luggage_dict)
+            if len(extra_luggage) != 0:
+                Emails.send_extra_luggage_bill(request, extra_luggage, email)
+        return redirect('staff:checkin list')
+
+
+
+
+
 
 
 

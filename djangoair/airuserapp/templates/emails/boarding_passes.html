@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p>You finished check-in successfully. Here's the list of your boarding passes:</p> <br/>
+
+{% for boarding_pass in boarding_passes_list %}
+    <p>-----------------------------------------------------</p>
+
+    <h2>{{code}}</h2>
+    <br/>
+<p>Destination: </p>
+<p>Date: </p>
+    <p> Passenger: {{boarding_pass.passenger_first_name}} {{boarding_pass.passenger_last_name}}</p>
+
+<p>Lunch: </p>
+<p>Luggage: {{boarding_pass.ticket.luggage}}, extra: {{boarding_pass.extra_luggage}} </p>
+
+{% endfor %}
+
+</body>
+</html>

@@ -38,7 +38,7 @@ class Passenger(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return '{} is a passenger'.format(self.user)
+        return '{}'.format(self.user)
 
 
 class Staff(models.Model):

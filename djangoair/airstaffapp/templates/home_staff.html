@@ -3,40 +3,45 @@
 
 {% if request.user.is_airlines_staff %}
 
-{% if role %}
-<h3>Your role is {{role}}.</h3>
+    {% if role %}
+        <h3>Your role is {{role}}.</h3>
 
-{% if role == 'supervisor' %}
+        {% if role == 'supervisor' %}
 
-<p>You can
-    <a href="{% url 'staff:staff list' %}">see staff list</a>.
-</p>
+            <p>You can
+                <a href="{% url 'staff:staff list' %}">see staff list</a>.
+            </p>
 
-<p> You also can
-    <a href="{% url 'staff:flights' %}">see flights</a>.
-</p>
+            <p> You also can
+                <a href="{% url 'staff:flights' %}">see flights</a>.
+            </p>
 
-<p>
-    <a href="{% url 'staff:lunch options' %}">Lunch options.</a>
-</p>
+            <p>
+                <a href="{% url 'staff:lunch options' %}">Lunch options.</a>
+            </p>
 
-<p>
-    <a href="{% url 'staff:luggage options' %}">Lunch options.</a>
-</p>
+            <p>
+                <a href="{% url 'staff:luggage options' %}">Lunch options.</a>
+            </p>
 
-{% elif role == 'gate_manager' %}
-<p>Here will be some functions for gate manager</p>
+        {% endif %}
 
-{% elif role == 'checkin_manager' %}
-<p>Here will be some functions for checkin manager</p>
-{% endif %}
+        {% if role == 'supervisor' or role == 'checkin_manager' %}
+            <p>
+                <a href="{% url 'staff:checkin list' %}">View check-in list</a>
+            </p>
+        {% endif %}
+
+        {% if role == 'supervisor' or role == 'gate_manager' %}
+            <p>Here will be some functions for gate manager</p>
+        {% endif %}
+
+    {% else %}
+        <h3>You do not have a role yet. Please, contact your supervisor.</h3>
+    {% endif %}
 
 {% else %}
-<h3>You do not have a role yet. Please, contact your supervisor.</h3>
-{% endif %}
-
-{% else %}
-<h2>You do not have access to this page.</h2>
+    <h2>You do not have access to this page.</h2>
 {% endif %}
 
 {% endblock %}

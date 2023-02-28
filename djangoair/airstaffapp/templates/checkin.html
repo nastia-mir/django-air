@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if request_user_role == 'supervisor' or request_user_role == 'checkin_manager' %}
+    <p>Ticket: {{checkin.ticket}}</p>
+    <p>Ticket owner: {{checkin.ticket.passenger}}</p>
+    <br/>
+    <p>Passenger first name: {{checkin.passenger_first_name}}</p>
+    <p>Passenger last name: {{checkin.passenger_last_name}}</p>
+    <p>Extra luggage: {{checkin.extra_luggage}} ({{extra_luggage_price}}$)</p>
+    <p>Status: {{checkin.get_status_display}}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Approve"/>
+    </form>
+
+
+{% else %}
+<h2>You do not have access to this page.</h2>
+{% endif %}
+
+{% endblock %}

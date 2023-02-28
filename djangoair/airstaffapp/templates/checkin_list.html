@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if request_user_role == 'supervisor' or request_user_role == 'checkin_manager' %}
+
+    {% for checkin in object_list  %}
+    <p>
+        <a href="{% url 'staff:checkin' checkin.id %}">{{checkin}}</a>
+    </p>
+    {% endfor %}
+
+{% else %}
+<h2>You do not have access to this page.</h2>
+{% endif %}
+
+{% endblock %}

@@ -17,7 +17,10 @@ urlpatterns = [
     path('flights/create/', login_required(views.CreateFlightView.as_view()), name='create flight'),
     path('flights/<pk>/details/', login_required(views.FlightDetailsView.as_view()), name='flight details'),
     path('flights/<pk>/cancel/', login_required(views.CancelFlightView.as_view()), name='cancel flight'),
-    path('flights/canceled/', login_required(views.CanceledFLightsListView.as_view()), name='canceled flights')
+    path('flights/canceled/', login_required(views.CanceledFLightsListView.as_view()), name='canceled flights'),
+
+    path('checkin/', login_required(views.CheckInListView.as_view()), name='checkin list'),
+    path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin')
 
 
 

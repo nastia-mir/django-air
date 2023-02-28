@@ -22,7 +22,7 @@ class Ticket(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return '{}, {} tickets to {}'.format(self.passenger, self.tickets_quantity, self.flight)
+        return '{} tickets to {}'.format(self.tickets_quantity, self.flight)
 
 
 class CheckIn(models.Model):
@@ -32,21 +32,21 @@ class CheckIn(models.Model):
     extra_luggage = models.IntegerField(default=0)
     status_choices = (
         ('in_progress', 'In progress'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected')
+        ('completed', 'Completed')
     )
     status = models.CharField(max_length=100, choices=status_choices, default='in_progress')
 
     objects = models.Manager()
 
     def __str__(self):
-        return '{}, status: {}'.format(self.ticket, self.get_status_display())
+        return '{} {}, status: {}'.format(self.passenger_first_name, self.passenger_last_name, self.get_status_display())
 
 
 class BoardingPass(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='boarding_pass')
     passenger_first_name = models.CharField(max_length=150, null=False, blank=False)
     passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
+    extra_luggage = models.IntegerField(default=0)
     code = models.CharField(max_length=10, blank=False, null=False)
 
     objects = models.Manager()
