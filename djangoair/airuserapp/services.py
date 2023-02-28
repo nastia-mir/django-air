@@ -1,3 +1,5 @@
+import json
+
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -31,3 +33,5 @@ class Emails:
             messages.success(request, 'Your tickets is available at your email and in personal cabinet.')
         else:
             messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")
+
+

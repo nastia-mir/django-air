@@ -3,7 +3,7 @@
 
 {% if request.user.is_authenticated %}
 
-<p>Your tickets:</p>
+<p>Your ticket:</p>
 
 <p>
     Flight: {{ticket.flight}}
@@ -19,8 +19,6 @@
 
 {% if not ticket.check_in %}
 <a href="{% url 'passengers:checkin' ticket.id %}">Check in</a>
-{% else %}
-<p>Check in completed.</p>
 {% endif %}
 
 {% else %}

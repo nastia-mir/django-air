@@ -1,0 +1,39 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if form %}
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <p>You need to add {{left}} more passengers.</p>
+    <input type="submit" name="add_passenger" value="Add passenger"/>
+</form>
+
+{% else %}
+
+{% if left == 0 %}
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" name="checkin" value="Finish check-in"/>
+</form>
+
+{% elif left == -1 %}
+<p>You entered too many passengers. Please check the data you provided.</p>
+{% endif %}
+{% endif %}
+
+
+{% if passengers %}
+{% for passenger in passengers %}
+
+<p>
+    {{passenger}}
+    <a href="{% url 'passengers:delete passenger' ticket.id passenger.id %}">Delete</a>
+
+</p>
+
+{% endfor %}
+{% endif %}
+
+{% endblock %}
