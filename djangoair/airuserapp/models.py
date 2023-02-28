@@ -19,19 +19,11 @@ class Ticket(models.Model):
         return '{}, {} tickets to {}'.format(self.passenger, self.tickets_quantity, self.flight)
 
 
-class PassengerName(models.Model):
-    first_name = models.CharField(max_length=150, null=False, blank=False)
-    last_name = models.CharField(max_length=150, null=False, blank=False)
-
-    objects = models.Manager()
-
-    def __str__(self):
-        return '{} {}'.format(self.first_name, self.last_name)
-
-
 class CheckIn(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket')
-    passengers = models.ManyToManyField(PassengerName)
+    passenger_first_name = models.CharField(max_length=150, null=False, blank=False)
+    passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
+    extra_luggage = models.IntegerField(default=0)
     status_choices = (
         ('in_progress', 'In progress'),
         ('completed', 'Completed'),
@@ -47,7 +39,8 @@ class CheckIn(models.Model):
 
 class BoardingPass(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='boarding_pass')
-    passenger = models.OneToOneField(PassengerName, on_delete=models.CASCADE, related_name='passenger_name')
+    passenger_first_name = models.CharField(max_length=150, null=False, blank=False)
+    passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
     code = models.CharField(max_length=10, blank=False, null=False)
 
     objects = models.Manager()

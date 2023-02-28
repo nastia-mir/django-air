@@ -3,8 +3,8 @@ from django.views.generic.edit import ProcessFormView
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
-from airuserapp.forms import TicketForm, PassengerNameForm
-from airuserapp.models import Ticket, CheckIn, PassengerName
+from airuserapp.forms import TicketForm, CheckInForm
+from airuserapp.models import Ticket, CheckIn
 from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -144,12 +144,10 @@ class CheckInView(ProcessFormView):
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
         context['ticket'] = ticket
         checkin, created = CheckIn.objects.get_or_create(ticket=ticket)
-        print(checkin.passengers.all())
         if not created and checkin.passengers.all():
-
             context['passengers'] = checkin.passengers.all()
             if checkin.passengers.count() < ticket.tickets_quantity:
-                context['form'] = PassengerNameForm
+                context['form'] = CheckInForm
                 context['left'] = ticket.tickets_quantity - checkin.passengers.count()
             elif checkin.passengers.count() == ticket.tickets_quantity:
                 context['form'] = None
@@ -160,7 +158,7 @@ class CheckInView(ProcessFormView):
 
         else:
             context['passengers'] = None
-            context['form'] = PassengerNameForm
+            context['form'] = CheckInForm
             context['left'] = ticket.tickets_quantity
 
         return render(request, 'passenger_checkin.html', context)
@@ -169,7 +167,7 @@ class CheckInView(ProcessFormView):
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
         checkin = CheckIn.objects.get(ticket=ticket)
         if 'add_passenger' in request.POST:
-            form = PassengerNameForm(request.POST)
+            form = CheckInForm(request.POST)
             if form.is_valid():
                 name_form = form.save(commit=False)
                 print(name_form)
@@ -186,11 +184,12 @@ class CheckInView(ProcessFormView):
 
 class DeleteFromCheckin(DeleteView):
     def get(self, request, pk, passenger_pk):
-        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        '''ticket = Ticket.objects.get(id=self.kwargs['pk'])
         checkin = CheckIn.objects.get(ticket=ticket)
         passenger = PassengerName.objects.get(id=self.kwargs['passenger_pk'])
         checkin.passengers.remove(passenger)
-        return redirect(reverse('passengers:checkin', args={pk}))
+        return redirect(reverse('passengers:checkin', args={pk}))'''
+        pass
 
 
 

@@ -32,9 +32,4 @@ class DateForm(ModelForm):
 class FlightCreationForm(ModelForm):
     class Meta:
         model = Flight
-        fields = ['destination', 'passengers', 'ticket_price', 'lunch', 'luggage']
-
-        '''widget = {
-            'lunch': CheckboxSelectMultiple,
-            'luggage': CheckboxSelectMultiple
-        }'''
+        fields = ['destination', 'passengers', 'ticket_price', 'lunch', 'luggage', 'extra_luggage_price']

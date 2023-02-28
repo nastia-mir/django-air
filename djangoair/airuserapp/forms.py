@@ -2,7 +2,7 @@ from django.forms import ModelForm, ChoiceField, Form, CharField
 
 from airstaffapp.models import Flight
 
-from airuserapp.models import PassengerName
+from airuserapp.models import CheckIn
 
 
 class TicketForm(ModelForm):
@@ -24,8 +24,8 @@ class TicketForm(ModelForm):
     widgets = {'date': ChoiceField()}
 
 
-class PassengerNameForm(ModelForm):
+class CheckInForm(ModelForm):
     class Meta:
-        model = PassengerName
-        fields = ['first_name', 'last_name']
+        model = CheckIn
+        fields = ['passenger_first_name', 'passenger_last_name', 'extra_luggage']
 

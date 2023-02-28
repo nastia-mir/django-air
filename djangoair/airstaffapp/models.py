@@ -56,6 +56,7 @@ class Flight(models.Model):
     ticket_price = models.IntegerField(blank=False, null=False)
     lunch = models.ManyToManyField(LunchOptions, related_name='lunch_pool')
     luggage = models.ManyToManyField(LuggageOptions, related_name='luggage_pool')
+    extra_luggage_price = models.IntegerField(default=50)
 
     is_canceled = models.BooleanField(default=False)
 
