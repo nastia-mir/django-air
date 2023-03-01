@@ -1,0 +1,9 @@
+Dear passenger,
+
+We are regret to inform you that you flight {{flight}} was canceled.
+
+Your refung: {{refund}}$
+
+Thank you for choosing Django Air!
+
+(this is a study project. if I used your email, it was unitentional, I'm sorry)

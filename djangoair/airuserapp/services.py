@@ -20,6 +20,24 @@ class Emails:
             messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")
 
     @classmethod
+    def send_flight_cancellation_info(cls, request, flight, ticket):
+        refund = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
+        passenger_email = ticket.passenger.user.email
+        context = {'flight': flight,
+                   'refund': refund}
+        subject = 'Django Air: Flight cancellation'
+        message = render_to_string("emails/flight_cancellation.txt", context)
+        email = send_mail(subject, message, EMAIL_HOST_USER, [passenger_email, EMAIL_HOST_USER])
+        if email:
+            messages.success(request, 'Email if sent.')
+        else:
+            messages.error(request, "Email is not sent.")
+
+
+
+
+
+    @classmethod
     def send_ticket_details(cls, request, email, ticket):
         context = {'ticket': ticket}
         total_price = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price

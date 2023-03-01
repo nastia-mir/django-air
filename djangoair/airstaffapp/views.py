@@ -10,7 +10,7 @@ from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm, DateForm
 from airstaffapp.services import CreateBoardingPass
 
-from airuserapp.models import CheckIn, BoardingPass
+from airuserapp.models import Ticket, CheckIn, BoardingPass
 from airuserapp.services import Emails
 
 
@@ -173,6 +173,11 @@ class CancelFlightView(UpdateView):
             flight = Flight.objects.get(id=self.kwargs['pk'])
             flight.is_canceled = True
             flight.save()
+
+            tickets = list(Ticket.objects.filter(flight=flight).all())
+            for ticket in tickets:
+                Emails.send_flight_cancellation_info(request, flight, ticket)
+
             return redirect(reverse('staff:flights'))
         except:
             return redirect(reverse('staff:flights'))
