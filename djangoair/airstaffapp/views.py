@@ -223,14 +223,44 @@ class CheckInView(ProcessFormView):
             extra_luggage_passes = []
             for boarding_pass in boarding_passes_list:
                 if boarding_pass.extra_luggage != 0:
-                    '''extra_luggage_dict = {'passenger': '{} {}'.format(boarding_pass.passenger_first_name,
-                                                                      boarding_pass.passenger_last_name),
-                                          'extra_luggage': boarding_pass.extra_luggage,
-                                          'price': boarding_pass.ticket.flight.extra_luggage_price * boarding_pass.extra_luggage}'''
                     extra_luggage_passes.append(boarding_pass)
             if len(extra_luggage_passes) != 0:
                 Emails.send_extra_luggage_bill(request, extra_luggage_passes, email)
         return redirect('staff:checkin list')
+
+
+class GateListView(ListView):
+    template_name = 'gate_list.html'
+    queryset = BoardingPass.objects.filter(status='in_progress')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(GateListView, self).get_context_data()
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        return context
+
+
+class GateView(ProcessFormView):
+    def get(self, request, pk):
+        boarding_pass = BoardingPass.objects.get(id=pk)
+        context = {'boarding_pass': boarding_pass,
+                   'request_user_role': Staff.objects.get(user=self.request.user).role}
+        return render(request, 'gate_approve.html', context)
+
+    def post(self, request, pk):
+        boarding_pass = BoardingPass.objects.get(id=pk)
+        boarding_pass.status = 'completed'
+        boarding_pass.save()
+
+        try:
+            not_registered = BoardingPass.objects.filter(ticket=boarding_pass.ticket, status='in_progress')[0]
+        except:
+            boarding_pass.ticket.gate_registration_options = 'completed'
+            boarding_pass.ticket.save()
+            email = boarding_pass.ticket.passenger.user.email
+            Emails.seng_gate_register_confirmation(request, email)
+
+        return redirect('staff:gate list')
+
 
 
 

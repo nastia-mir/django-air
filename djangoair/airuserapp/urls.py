@@ -14,7 +14,9 @@ urlpatterns = [
 
     path('view_ticket/<pk>/', login_required(views.ViewTicketView.as_view()), name='view ticket'),
     path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin'),
-    path('checkin/delete/<pk>/', login_required(views.DeleteFromCheckin.as_view()), name='delete checkin')
+    path('checkin/delete/<pk>/', login_required(views.DeleteFromCheckin.as_view()), name='delete checkin'),
+
+    path('gate/<pk>/', login_required(views.GateRegisterView.as_view()), name='gate register')
 
 
 

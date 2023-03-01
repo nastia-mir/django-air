@@ -1,0 +1,22 @@
+{% extends  "main.html" %}
+{% block content %}
+
+{% if request.user.is_authenticated %}
+
+    <p>Your boarding passes:</p>
+
+    {% for boarding_pass in boarding_passes_list %}
+        <p>{{boarding_pass}}</p>
+    {% endfor %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Register"/>
+    </form>
+
+
+{% else %}
+    <h2>You need to login to view you tickets details.</h2>
+{% endif %}
+
+{% endblock %}

@@ -20,6 +20,16 @@
     <p>Check-in status: {{ticket.get_check_in_display}}</p>
     {% if ticket.check_in == 'no_checkin' or ticket.check_in == 'editing' %}
         <a href="{% url 'passengers:checkin' ticket.id %}">Check-in</a>
+
+
+    {% elif ticket.check_in == 'completed' %}
+
+        <p>Registration status: {{ticket.get_gate_registration_display}}</p>
+
+        {% if ticket.gate_registration == 'not_registered' %}
+            <a href="{% url 'passengers:gate register' ticket.id %}">Register</a>
+        {% endif %}
+
     {% endif %}
 
 {% else %}

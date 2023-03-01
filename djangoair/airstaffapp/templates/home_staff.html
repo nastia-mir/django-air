@@ -33,7 +33,9 @@
         {% endif %}
 
         {% if role == 'supervisor' or role == 'gate_manager' %}
-            <p>Here will be some functions for gate manager</p>
+             <p>
+                <a href="{% url 'staff:gate list' %}">View gate list</a>
+            </p>
         {% endif %}
 
     {% else %}

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm, CheckInForm
-from airuserapp.models import Ticket, CheckIn
+from airuserapp.models import Ticket, CheckIn, BoardingPass
 from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -192,6 +192,21 @@ class DeleteFromCheckin(DeleteView):
         checkin.delete()
         return redirect(reverse('passengers:checkin', args={checkin.ticket.id}))
 
+
+class GateRegisterView(ProcessFormView):
+    def get(self, request, pk):
+        ticket = Ticket.objects.get(id=pk)
+        context = {'boarding_passes_list': list(BoardingPass.objects.filter(ticket=ticket))}
+        return render(request, 'gate_register.html', context)
+
+    def post(self, request, pk):
+        ticket = Ticket.objects.get(id=pk)
+        for boarding_pass in list(BoardingPass.objects.filter(ticket=ticket)):
+            boarding_pass.status = 'in_progress'
+            boarding_pass.save()
+        ticket.gate_registration = 'waiting_for_approval'
+        ticket.save()
+        return redirect(reverse('passengers:view ticket', args={pk}))
 
 
 

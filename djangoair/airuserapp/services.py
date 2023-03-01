@@ -43,9 +43,9 @@ class Emails:
         message = strip_tags(render_to_string("emails/boarding_passes.html", context))
         email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
         if email:
-            messages.success(request, 'Boarding passes sent.')
+            messages.success(request, 'Boarding passes are sent.')
         else:
-            messages.error(request, "Boarding passes not sent.")
+            messages.error(request, "Boarding passes are  not sent.")
 
     @classmethod
     def send_extra_luggage_bill(cls, request, extra_luggage_passes, email):
@@ -57,9 +57,21 @@ class Emails:
         message = render_to_string("emails/extra_luggage_bill.txt", context)
         email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
         if email:
-            messages.success(request, 'Extra luggage bills sent.')
+            messages.success(request, 'Extra luggage bills is sent.')
         else:
-            messages.error(request, "Extra luggage bill not sent.")
+            messages.error(request, "Extra luggage bill is not sent.")
+
+    @classmethod
+    def seng_gate_register_confirmation(cls, request, email):
+        subject = 'Django Air: Successfully registered for a flight'
+        message = render_to_string("emails/register_confirmation.txt")
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        if email:
+            messages.success(request, 'Register confirmation email is sent.')
+        else:
+            messages.error(request, "Register confirmation email is not sent.")
+
+
 
 
 

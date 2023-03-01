@@ -9,3 +9,5 @@ Luggage: {{ticket.luggage}}
 Total price: {{total_price}}$
 
 Thank you for choosing Django Air!
+
+(this is a study project. if I used your email, it was unitentional, I'm sorry)

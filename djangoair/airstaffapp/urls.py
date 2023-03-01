@@ -20,7 +20,10 @@ urlpatterns = [
     path('flights/canceled/', login_required(views.CanceledFLightsListView.as_view()), name='canceled flights'),
 
     path('checkin/', login_required(views.CheckInListView.as_view()), name='checkin list'),
-    path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin')
+    path('checkin/<pk>/', login_required(views.CheckInView.as_view()), name='checkin'),
+
+    path('gate/', login_required(views.GateListView.as_view()), name='gate list'),
+    path('gate/<pk>/', login_required(views.GateView.as_view()), name='gate register'),
 
 
 

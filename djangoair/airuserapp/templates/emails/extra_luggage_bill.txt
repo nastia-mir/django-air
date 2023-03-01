@@ -9,3 +9,5 @@ Price: {{boarding_pass.ticket.flight.extra_luggage_price}}
 {% endfor %}
 
 Thank you for choosing Django Air!
+
+(this is a study project. if I used your email, it was unitentional, I'm sorry)

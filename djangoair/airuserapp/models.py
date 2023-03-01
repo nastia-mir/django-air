@@ -19,6 +19,14 @@ class Ticket(models.Model):
     )
     check_in = models.CharField(max_length=150, choices=checkin_options, default='no_checkin')
 
+    gate_registration_options = (
+        ('not_registered', 'Not registered'),
+        ('waiting_for_approval', 'Waiting for approval'),
+        ('completed', 'Completed')
+    )
+
+    gate_registration = models.CharField(max_length=150, choices=gate_registration_options, default='not_registered')
+
     objects = models.Manager()
 
     def __str__(self):
@@ -49,7 +57,14 @@ class BoardingPass(models.Model):
     extra_luggage = models.IntegerField(default=0)
     code = models.CharField(max_length=10, blank=False, null=False)
 
+    status_choices = (
+        ('not_registered', 'Not registered'),
+        ('in_progress', 'In progress'),
+        ('completed', 'Completed')
+    )
+    status = models.CharField(max_length=100, choices=status_choices, default='not_registered')
+
     objects = models.Manager()
 
     def __str__(self):
-        return '{}, {}'.format(self.code, self.passenger_first_name, self.passenger_last_name)
+        return '{}, {} {}'.format(self.code, self.passenger_first_name, self.passenger_last_name)
