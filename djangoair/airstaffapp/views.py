@@ -1,3 +1,5 @@
+import json
+
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, ListView
 from django.views.generic.edit import ProcessFormView
 from django.shortcuts import render, redirect, reverse
@@ -210,7 +212,7 @@ class CheckInView(ProcessFormView):
         checkin.save()
         CreateBoardingPass.create_boarding_pass(checkin)
         try:
-            no_checkin = CheckIn.objects.get(ticket=checkin.ticket, status='in_progress').first()
+            no_checkin = CheckIn.objects.filter(ticket=checkin.ticket, status='in_progress')[0]
         except:
             checkin.ticket.check_in = 'completed'
             checkin.ticket.save()
@@ -218,16 +220,16 @@ class CheckInView(ProcessFormView):
             email = checkin.ticket.passenger.user.email
             Emails.send_boarding_pass(request, boarding_passes_list, email)
 
-            extra_luggage = []
+            extra_luggage_passes = []
             for boarding_pass in boarding_passes_list:
                 if boarding_pass.extra_luggage != 0:
-                    extra_luggage_dict = {'passenger': '{} {}'.format(boarding_pass.passenger_first_name,
-                                                                      boarding_pass.passenger_first_name),
+                    '''extra_luggage_dict = {'passenger': '{} {}'.format(boarding_pass.passenger_first_name,
+                                                                      boarding_pass.passenger_last_name),
                                           'extra_luggage': boarding_pass.extra_luggage,
-                                          'price': boarding_pass.ticket.flight.extra_luggage_price * boarding_pass.extra_luggage}
-                    extra_luggage.append(extra_luggage_dict)
-            if len(extra_luggage) != 0:
-                Emails.send_extra_luggage_bill(request, extra_luggage, email)
+                                          'price': boarding_pass.ticket.flight.extra_luggage_price * boarding_pass.extra_luggage}'''
+                    extra_luggage_passes.append(boarding_pass)
+            if len(extra_luggage_passes) != 0:
+                Emails.send_extra_luggage_bill(request, extra_luggage_passes, email)
         return redirect('staff:checkin list')
 
 

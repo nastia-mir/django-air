@@ -1,8 +1,7 @@
-import json
-
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib import messages
+from django.utils.html import strip_tags
 
 from djangoairproject.settings import EMAIL_HOST_USER
 
@@ -41,7 +40,7 @@ class Emails:
         }
 
         subject = 'Django Air: Boarding Passes'
-        message = render_to_string("emails/boarding_passes.html", context)
+        message = strip_tags(render_to_string("emails/boarding_passes.html", context))
         email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
         if email:
             messages.success(request, 'Boarding passes sent.')
@@ -49,9 +48,9 @@ class Emails:
             messages.error(request, "Boarding passes not sent.")
 
     @classmethod
-    def send_extra_luggage_bill(cls, request, extra_luggage, email):
+    def send_extra_luggage_bill(cls, request, extra_luggage_passes, email):
         context = {
-            'extra_luggage': extra_luggage
+            'extra_luggage_passes': extra_luggage_passes
         }
 
         subject = 'Django Air: Extra luggage bill'

@@ -52,4 +52,4 @@ class BoardingPass(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return '{}, {}'.format(self.code, self.passenger)
+        return '{}, {}'.format(self.code, self.passenger_first_name, self.passenger_last_name)
