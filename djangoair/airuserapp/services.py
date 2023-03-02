@@ -33,10 +33,6 @@ class Emails:
         else:
             messages.error(request, "Email is not sent.")
 
-
-
-
-
     @classmethod
     def send_ticket_details(cls, request, email, ticket):
         context = {'ticket': ticket}
@@ -88,8 +84,3 @@ class Emails:
             messages.success(request, 'Register confirmation email is sent.')
         else:
             messages.error(request, "Register confirmation email is not sent.")
-
-
-
-
-

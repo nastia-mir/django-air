@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
 from django.views.generic.edit import ProcessFormView
+from django.core.cache import cache
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
@@ -66,6 +67,7 @@ class TicketDetailsView(UpdateView):
     def get_context_data(self):
         context = super(TicketDetailsView, self).get_context_data()
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        cache.set('ticket', ticket, 30)
         context['ticket_price'] = ticket.flight.ticket_price * ticket.tickets_quantity
         context['lunch_options'] = ticket.flight.lunch.all()
         context['luggage_options'] = ticket.flight.luggage.all()
@@ -75,7 +77,8 @@ class TicketDetailsView(UpdateView):
     def post(self, request, pk):
         lunch = request.POST.get('lunch')
         luggage = request.POST.get('luggage')
-        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        ticket = cache.get('ticket')
+        cache.delete('ticket')
         ticket.lunch = LunchOptions.objects.get(description=lunch.split(',')[0])
         luggage_options = {
             'No luggage': '0',
@@ -92,6 +95,7 @@ class TicketBookingView(UpdateView):
     def get(self, request, pk):
         context = {'form': EmailForm}
         ticket = Ticket.objects.get(id=pk)
+        cache.set('ticket', ticket, 30)
         context['ticket'] = ticket
         total_price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
         context['total_price'] = total_price
@@ -103,7 +107,8 @@ class TicketBookingView(UpdateView):
 
     def post(self, request, pk):
         email_form = EmailForm(request.POST)
-        ticket = Ticket.objects.get(id=pk)
+        ticket = cache.get('ticket')
+        cache.delete('ticket')
         if email_form.is_valid():
             email = email_form.cleaned_data['email']
             try:
@@ -134,14 +139,19 @@ class ViewTicketView(TemplateView):
     def get_context_data(self, pk):
         context = super(ViewTicketView, self).get_context_data()
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        cache.set('ticket', ticket, 600)
         context['ticket'] = ticket
         return context
 
 
 class CheckInView(ProcessFormView):
     def get(self, request, pk):
+        if cache.get('ticket'):
+            ticket = cache.get('ticket')
+        else:
+            ticket = Ticket.objects.get(id=pk)
+
         context = {}
-        ticket = Ticket.objects.get(id=self.kwargs['pk'])
         if ticket.check_in == 'waiting_for_approval' or ticket.check_in == 'completed':
             context['check_in'] = True
         else:
@@ -167,7 +177,7 @@ class CheckInView(ProcessFormView):
             return render(request, 'passenger_checkin.html', context)
 
     def post(self, request, pk):
-        ticket = Ticket.objects.get(id=self.kwargs['pk'])
+        ticket = cache.get('ticket')
         if 'add_passenger' in request.POST:
             form = CheckInForm(request.POST)
             if form.is_valid():
@@ -177,12 +187,15 @@ class CheckInView(ProcessFormView):
                 if ticket.check_in != 'editing':
                     ticket.check_in = 'editing'
                     ticket.save()
+                    cache.delete('ticket')
+                    cache.set('ticket', ticket, 600)
             else:
                 messages.error(request, 'Please enter valid data.')
             return redirect(reverse('passengers:checkin', args={pk}))
         elif 'checkin' in request.POST:
             ticket.check_in = 'waiting_for_approval'
             ticket.save()
+            cache.delete('ticket')
             return redirect(reverse('passengers:view ticket', args={pk}))
 
 
@@ -196,11 +209,12 @@ class DeleteFromCheckin(DeleteView):
 class GateRegisterView(ProcessFormView):
     def get(self, request, pk):
         ticket = Ticket.objects.get(id=pk)
+        cache.set('ticket', ticket, 30)
         context = {'boarding_passes_list': list(BoardingPass.objects.filter(ticket=ticket))}
         return render(request, 'gate_register.html', context)
 
     def post(self, request, pk):
-        ticket = Ticket.objects.get(id=pk)
+        ticket = cache.get('ticket')
         for boarding_pass in list(BoardingPass.objects.filter(ticket=ticket)):
             boarding_pass.status = 'in_progress'
             boarding_pass.save()

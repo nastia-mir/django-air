@@ -116,7 +116,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# email configs
+# Email configs
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -126,3 +126,13 @@ EMAIL_HOST_USER = 'nastasia.ua@gmail.com'
 EMAIL_HOST_PASSWORD = 'zzwwokjdrkwmmknt'
 
 PASSWORD_RESET_TIMEOUT = 14400
+
+
+# Cache
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
