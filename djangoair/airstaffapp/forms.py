@@ -1,5 +1,4 @@
-from django.forms import ModelForm, CheckboxSelectMultiple
-from django.forms.widgets import DateInput
+from django.forms import ModelForm
 
 from accounts.models import Staff
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions

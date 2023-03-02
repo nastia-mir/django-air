@@ -18,7 +18,7 @@ class LuggageOptions(models.Model):
         ('2', 'Two luggage')
     )
     quantity = models.CharField(max_length=150, choices=quantity_options)
-    price = models.IntegerField(blank=False, null=False)
+    price = models.IntegerField(blank=True, null=True)
 
     objects = models.Manager()
 
