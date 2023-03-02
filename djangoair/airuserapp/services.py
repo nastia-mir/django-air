@@ -13,7 +13,7 @@ class Emails:
         message = render_to_string("emails/temp_password.txt", {
             'password': password
         })
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'We send you a temporary password. Please, check your email.')
         else:
@@ -27,7 +27,7 @@ class Emails:
                    'refund': refund}
         subject = 'Django Air: Flight cancellation'
         message = render_to_string("emails/flight_cancellation.txt", context)
-        email = send_mail(subject, message, EMAIL_HOST_USER, [passenger_email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [passenger_email])
         if email:
             messages.success(request, 'Email if sent.')
         else:
@@ -41,7 +41,7 @@ class Emails:
 
         subject = 'Django Air: Tickets'
         message = render_to_string("emails/tickets_info.txt", context)
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'Your tickets is available at your email and in personal cabinet.')
         else:
@@ -55,7 +55,7 @@ class Emails:
 
         subject = 'Django Air: Boarding Passes'
         message = strip_tags(render_to_string("emails/boarding_passes.html", context))
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'Boarding passes are sent.')
         else:
@@ -69,7 +69,7 @@ class Emails:
 
         subject = 'Django Air: Extra luggage bill'
         message = render_to_string("emails/extra_luggage_bill.txt", context)
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'Extra luggage bills is sent.')
         else:
@@ -79,7 +79,7 @@ class Emails:
     def seng_gate_register_confirmation(cls, request, email):
         subject = 'Django Air: Successfully registered for a flight'
         message = render_to_string("emails/register_confirmation.txt")
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email, EMAIL_HOST_USER])
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'Register confirmation email is sent.')
         else:
