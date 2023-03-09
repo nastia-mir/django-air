@@ -1,7 +1,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from accounts.models import MyUser, Passenger, Staff
+from accounts.models import MyUser
 
 
 class TestViews(TestCase):
