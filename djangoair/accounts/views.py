@@ -12,10 +12,6 @@ from accounts.services import PasswordGenerator
 from airuserapp.services import Emails
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
-
-
 class LoginView(ProcessFormView):
     def post(self, request):
         email = request.POST.get('email')
@@ -80,6 +76,9 @@ class EditProfileView(ProcessFormView):
             request.user.last_name = user_form.last_name
             request.user.save()
             return redirect('passengers:home')
+        else:
+            messages.error(request, 'Something went wrong.')
+            return redirect('passengers:edit profile')
 
 
 class ChangePasswordView(ProcessFormView):
@@ -96,6 +95,7 @@ class ChangePasswordView(ProcessFormView):
             return redirect('passengers:home')
         else:
             messages.error(request, 'Something went wrong.')
+            return redirect('accounts:change password')
 
 
 class RestorePasswordView(ProcessFormView):
@@ -116,8 +116,8 @@ class RestorePasswordView(ProcessFormView):
                 return redirect('accounts:login')
             except:
                 messages.error(request, 'User with given email do not exist.')
-                return redirect('account:restore password')
+                return redirect('accounts:restore password')
 
         else:
             messages.error(request, 'Please enter valid email.')
-            return redirect('account:restore password')
+            return redirect('accounts:restore password')
