@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, ListView
 from django.views.generic.edit import ProcessFormView
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 from django.core.cache import cache
 
@@ -22,8 +24,12 @@ class HomeView(TemplateView):
         return context
 
 
-class StaffListView(TemplateView):
+class StaffListView(UserPassesTestMixin, TemplateView):
     template_name = "staff_list.html"
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get_context_data(self):
         context = super(StaffListView, self).get_context_data()
@@ -37,10 +43,14 @@ class StaffListView(TemplateView):
         return context
 
 
-class EditRoleView(UpdateView):
+class EditRoleView(UserPassesTestMixin, UpdateView):
     template_name = "edit_role.html"
     form_class = StaffRoleEditForm
     model = Staff
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get_success_url(self):
         return reverse('staff:staff list')
@@ -58,21 +68,11 @@ class EditRoleView(UpdateView):
         return super().form_valid(form)
 
 
-class FlightsView(TemplateView):
-    template_name = 'flights.html'
+class LunchOptionsView(UserPassesTestMixin, CreateView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
-    def get_context_data(self):
-        context = super(FlightsView, self).get_context_data()
-        flights = Flight.objects.all().order_by('date')
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
-        if len(flights) == 0:
-            context['empty'] = True
-        else:
-            context['flights'] = flights
-        return context
-
-
-class LunchOptionsView(CreateView):
     def get(self, request):
         context = {
             'options': LunchOptions.objects.all(),
@@ -88,14 +88,22 @@ class LunchOptionsView(CreateView):
             return redirect(reverse('staff:lunch options'))
 
 
-class LunchOptionsDeleteView(DeleteView):
+class LunchOptionsDeleteView(UserPassesTestMixin, DeleteView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
+
     def get(self, request, pk):
         lunch = LunchOptions.objects.get(id=pk)
         lunch.delete()
         return redirect(reverse('staff:lunch options'))
 
 
-class LuggageOptionsView(CreateView):
+class LuggageOptionsView(UserPassesTestMixin, CreateView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
+
     def get(self, request):
         context = {
             'options': LuggageOptions.objects.all(),
@@ -111,14 +119,39 @@ class LuggageOptionsView(CreateView):
             return redirect(reverse('staff:luggage options'))
 
 
-class LuggageOptionsDeleteView(DeleteView):
+class LuggageOptionsDeleteView(UserPassesTestMixin, DeleteView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
+
     def get(self, request, pk):
         luggage = LuggageOptions.objects.get(id=pk)
         luggage.delete()
         return redirect(reverse('staff:luggage options'))
 
 
-class CreateFlightView(CreateView):
+class FlightsView(UserPassesTestMixin, TemplateView):
+    template_name = 'flights.html'
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
+
+    def get_context_data(self):
+        context = super(FlightsView, self).get_context_data()
+        flights = Flight.objects.all().order_by('date')
+        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        if len(flights) == 0:
+            context['empty'] = True
+        else:
+            context['flights'] = flights
+        return context
+
+
+class CreateFlightView(UserPassesTestMixin, CreateView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get(self, request):
         context = {
@@ -139,10 +172,17 @@ class CreateFlightView(CreateView):
             flight.save()
             flight_form.save_m2m()
             return redirect(reverse('staff:flights'))
+        else:
+            messages.error(request, 'Something went wrong. Please check if provided data is valid.')
+            return redirect(reverse('staff:create flight'))
 
 
-class FlightDetailsView(TemplateView):
+class FlightDetailsView(UserPassesTestMixin, TemplateView):
     template_name = 'flight_details.html'
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get_context_data(self, pk):
         context = super(FlightDetailsView, self).get_context_data()
@@ -156,10 +196,14 @@ class FlightDetailsView(TemplateView):
         return context
 
 
-class CancelFlightView(UpdateView):
+class CancelFlightView(UserPassesTestMixin, UpdateView):
     template_name = 'cancel_flight.html'
     model = Flight
     fields = ['is_canceled']
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get_context_data(self):
         context = super(CancelFlightView, self).get_context_data()
@@ -182,9 +226,13 @@ class CancelFlightView(UpdateView):
             return redirect(reverse('staff:flights'))
 
 
-class CanceledFLightsListView(ListView):
+class CanceledFLightsListView(UserPassesTestMixin, ListView):
     template_name = 'canceled_flights_list.html'
     queryset = Flight.objects.filter(is_canceled=True).order_by('date')
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role == 'supervisor'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(CanceledFLightsListView, self).get_context_data()
@@ -192,9 +240,13 @@ class CanceledFLightsListView(ListView):
         return context
 
 
-class CheckInListView(ListView):
+class CheckInListView(UserPassesTestMixin, ListView):
     template_name = 'checkin_list.html'
     queryset = CheckIn.objects.filter(status='in_progress')
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role in ['supervisor', 'checkin_manager']
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(CheckInListView, self).get_context_data()
@@ -202,7 +254,11 @@ class CheckInListView(ListView):
         return context
 
 
-class CheckInView(ProcessFormView):
+class CheckInView(UserPassesTestMixin, ProcessFormView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role in ['supervisor', 'checkin_manager']
+
     def get(self, request, pk):
         checkin = CheckIn.objects.get(id=pk)
         cache.set('checkin', checkin, 30)
@@ -234,9 +290,13 @@ class CheckInView(ProcessFormView):
         return redirect('staff:checkin list')
 
 
-class GateListView(ListView):
+class GateListView(UserPassesTestMixin, ListView):
     template_name = 'gate_list.html'
     queryset = BoardingPass.objects.filter(status='in_progress')
+
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role in ['supervisor', 'gate_manager']
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(GateListView, self).get_context_data()
@@ -244,7 +304,11 @@ class GateListView(ListView):
         return context
 
 
-class GateView(ProcessFormView):
+class GateView(UserPassesTestMixin, ProcessFormView):
+    def test_func(self):
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        return request_user_role in ['supervisor', 'gate_manager']
+
     def get(self, request, pk):
         boarding_pass = BoardingPass.objects.get(id=pk)
         cache.set('boarding_pass', boarding_pass, 30)
