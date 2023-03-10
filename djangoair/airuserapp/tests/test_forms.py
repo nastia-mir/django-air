@@ -2,8 +2,6 @@ from django.test import TestCase
 
 from airuserapp import forms
 
-from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
-
 
 class TestForms(TestCase):
     def test_CheckInForm_valid_data(self):

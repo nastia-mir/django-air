@@ -67,7 +67,7 @@ class TicketDetailsView(UpdateView):
     def get_context_data(self):
         context = super(TicketDetailsView, self).get_context_data()
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
-        cache.set('ticket', ticket, 30)
+        cache.set('ticket', ticket, 300)
         context['ticket_price'] = ticket.flight.ticket_price * ticket.tickets_quantity
         context['lunch_options'] = ticket.flight.lunch.all()
         context['luggage_options'] = ticket.flight.luggage.all()
@@ -79,6 +79,8 @@ class TicketDetailsView(UpdateView):
         luggage = request.POST.get('luggage')
         ticket = cache.get('ticket')
         cache.delete('ticket')
+        if not ticket:
+            ticket = Ticket.objects.get(id=pk)
         ticket.lunch = LunchOptions.objects.get(description=lunch.split(',')[0])
         luggage_options = {
             'No luggage': '0',
