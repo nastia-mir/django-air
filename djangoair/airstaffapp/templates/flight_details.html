@@ -3,31 +3,43 @@
 
 {% if request_user_role == 'supervisor' %}
 
-<p>Destination: {{flight.get_destination_display}}</p>
-<p>Date: {{flight.date.date}}</p>
-<p>Passengers allowed: {{flight.passengers}}</p>
-<p>Ticket price: {{flight.ticket_price}}$</p>
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
 
-<p>Luggage options:
-    {% for item in luggage %}
-    {{item.get_quantity_display}}, {{item.price}}$;
-    {% endfor %}
+        <h5 class="card-title">
+            {{flight}}
+        </h5>
+        </br>
+        <p><b>Destination:</b> {{flight.get_destination_display}}</p>
+        <p><b>Date:</b> {{flight.date.date}}</p>
+        <p><b>Passengers allowed:</b> {{flight.passengers}}</p>
+        <p><b>Ticket price:</b> {{flight.ticket_price}}$</p>
 
-</p>
-<p>Extra luggage price: {{flight.extra_luggage_price}}$</p>
-<p>Lunch options:
-    {% for item in lunch %}
-    {{item.description}}, {{item.price}}$;
-    {% endfor %}
-</p>
+        <p><b>Luggage options:</b>
+            {% for item in luggage %}
+            {{item.get_quantity_display}}, {{item.price}}$;
+            {% endfor %}
 
-{% if flight.is_canceled %}
-<p>Canceled</p>
-{% endif %}
+        </p>
+        <p><b>Extra luggage price:</b> {{flight.extra_luggage_price}}$</p>
+        <p><b>Lunch options:</b>
+            {% for item in lunch %}
+            {{item.description}}, {{item.price}}$;
+            {% endfor %}
+        </p>
 
-<br/>
+        {% if flight.is_canceled %}
+        <p><b class="text-danger">Canceled.</b></p>
+        {% else %}
+        <a href="{% url 'staff:cancel flight' flight.id %}" class="btn btn-danger">Cancel flight</a>
+        {% endif %}
 
-<a href="{% url 'staff:flights' %}">Back to flight list</a>
+        <br/>
+    </div>
+</div>
+
+</br>
+<a href="{% url 'staff:flights' %}" class="btn btn-outline-secondary">Back to flight list</a>
 
 
 {% else %}

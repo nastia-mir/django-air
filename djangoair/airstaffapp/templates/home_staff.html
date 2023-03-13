@@ -4,37 +4,42 @@
 {% if request.user.is_airlines_staff %}
 
     {% if role %}
+
+    <ul class="list-group list-group-flush">
+
         {% if role == 'supervisor' %}
 
-            <p>You can
-                <a href="{% url 'staff:staff list' %}">see staff list</a>.
-            </p>
+            <li class="list-group-item">
+                <a href="{% url 'staff:staff list' %}" class="text-decoration-none text-body">Staff list</a>
+            </li>
 
-            <p> You also can
-                <a href="{% url 'staff:flights' %}">see flights</a>.
-            </p>
+            <li class="list-group-item">
+                <a href="{% url 'staff:flights' %}" class="text-decoration-none text-body">Flights</a>
+            </li>
 
-            <p>
-                <a href="{% url 'staff:lunch options' %}">Lunch options.</a>
-            </p>
+            <li class="list-group-item">
+                <a href="{% url 'staff:lunch options' %}" class="text-decoration-none text-body">Lunch options</a>
+            </li>
 
-            <p>
-                <a href="{% url 'staff:luggage options' %}">Lunch options.</a>
-            </p>
+            <li class="list-group-item">
+                <a href="{% url 'staff:luggage options' %}" class="text-decoration-none text-body">Luggage options</a>
+            </li>
 
         {% endif %}
 
         {% if role == 'supervisor' or role == 'checkin_manager' %}
-            <p>
-                <a href="{% url 'staff:checkin list' %}">View check-in list</a>
-            </p>
+            <li class="list-group-item">
+                <a href="{% url 'staff:checkin list' %}" class="text-decoration-none text-body">Check-in list</a>
+            </li>
         {% endif %}
 
         {% if role == 'supervisor' or role == 'gate_manager' %}
-             <p>
-                <a href="{% url 'staff:gate list' %}">View gate list</a>
-            </p>
+             <li class="list-group-item">
+                <a href="{% url 'staff:gate list' %}" class="text-decoration-none text-body">Gate list</a>
+            </li>
         {% endif %}
+
+    </ul>
 
     {% else %}
         <h3>You do not have a role yet. Please, contact your supervisor.</h3>

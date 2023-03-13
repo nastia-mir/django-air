@@ -3,11 +3,16 @@
 
 {% if request_user_role == 'supervisor' or request_user_role == 'gate_manager' %}
 
+<ul class="list-group list-group-flush">
     {% for register_request in object_list  %}
-    <p>
-        <a href="{% url 'staff:gate register' register_request.id %}">{{register_request}}</a>
-    </p>
+
+    <li class="list-group-item">
+        <a href="{% url 'staff:gate register' register_request.id %}"
+           class="text-decoration-none text-body">{{register_request}}</a>
+    </li>
+
     {% endfor %}
+</ul>
 
 {% else %}
 <h2>You do not have access to this page.</h2>

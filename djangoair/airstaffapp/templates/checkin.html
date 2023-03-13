@@ -2,19 +2,24 @@
 {% block content %}
 
 {% if request_user_role == 'supervisor' or request_user_role == 'checkin_manager' %}
-    <p>Ticket: {{checkin.ticket}}</p>
-    <p>Ticket owner: {{checkin.ticket.passenger}}</p>
-    <br/>
-    <p>Passenger first name: {{checkin.passenger_first_name}}</p>
-    <p>Passenger last name: {{checkin.passenger_last_name}}</p>
-    <p>Extra luggage: {{checkin.extra_luggage}} ({{extra_luggage_price}}$)</p>
-    <p>Status: {{checkin.get_status_display}}</p>
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
 
-    <form method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Approve"/>
-    </form>
+        <h5 class="card-title">{{checkin.ticket}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted"><b>Ticket owner:</b> {{checkin.ticket.passenger}}</h6>
 
+        <br/>
+        <p><b>Passenger first name:</b> {{checkin.passenger_first_name}}</p>
+        <p><b>Passenger last name:</b> {{checkin.passenger_last_name}}</p>
+        <p><b>Extra luggage:</b> {{checkin.extra_luggage}} ({{extra_luggage_price}}$)</p>
+        <p><b>Status:</b> {{checkin.get_status_display}}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Approve"/>
+        </form>
+    </div>
+</div>
 
 {% else %}
 <h2>You do not have access to this page.</h2>

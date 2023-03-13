@@ -3,31 +3,28 @@
 
 {% if request_user_role == 'supervisor' %}
 
-<p><a href="{% url 'staff:create flight' %}">Create new flight</a></p>
+<p><a href="{% url 'staff:create flight' %}" class="btn btn-outline-primary">Create new flight</a></p>
 
 {% if empty %}
 <p>There's no flights yet.</p>
 {% else %}
 
-{% for flight in flights %}
+<ul class="list-group list-group-flush">
+    {% for flight in flights %}
+    {% if not flight.is_canceled %}
 
-{% if not flight.is_canceled %}
+    <li class="list-group-item">
+        <a href="{% url 'staff:flight details' flight.id %}" class="text-decoration-none text-body">{{flight}}</a>
+        <a href="{% url 'staff:cancel flight' flight.id %}" class="text-danger text-decoration-none">Cancel flight</a>
+    </li>
 
-<p>
-    <a href="{% url 'staff:flight details' flight.id %}">{{flight}}</a>
-</p>
-
-<p>
-    <a href="{% url 'staff:cancel flight' flight.id %}">Cancel flight</a>
-</p>
-
+    {% endif %}
+    {% endfor %}
+</ul>
 {% endif %}
 
-{% endfor %}
-{% endif %}
-
-
-<a href="{% url 'staff:canceled flights' %}">View canceled flights.</a>
+</br>
+<a href="{% url 'staff:canceled flights' %}" class="btn btn-outline-secondary">Canceled flights.</a>
 
 {% else %}
 <h2>Only supervisors can access this page.</h2>

@@ -13,17 +13,18 @@
 
 {% include 'navigation.html' %}
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+<div class="container">
 
-<br/>
+    {% if messages %}
+    <ul class="list-group list-group-flush">
+        {% for message in messages %}
+        <li class="list-group-item">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
-<div  class="container">
+    <br/>
+
     {% block content %}
     {% endblock %}
 </div>

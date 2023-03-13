@@ -3,18 +3,24 @@
 
 {% if request_user_role == 'supervisor' %}
 
-<form method="POST" action="">
+<form method="POST">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="submit" value="Create"/>
+    <input class="btn btn-primary" type="submit" value="Create"/>
 </form>
 
+</br>
+<ul class="list-group list-group-flush">
+    {% for lunch in options %}
 
-{% for lunch in options %}
-<p>{{lunch}}
-    <a href="{% url 'staff:delete lunch' lunch.id %}">Delete</a>
-</p>
-{% endfor %}
+    <li class="list-group-item">
+        {{lunch}}
+        <a href="{% url 'staff:delete lunch' lunch.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
 
 {% else %}
 <h2>Only supervisors can access this page.</h2>

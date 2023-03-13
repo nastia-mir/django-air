@@ -2,21 +2,23 @@
 {% block content %}
 
 {% if request_user_role == 'supervisor' or request_user_role == 'gate_manager' %}
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
 
-    <h3>{{boarding_pass.code}}</h3>
+        <h5 class="card-title">{{boarding_pass.code}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted"><b>Ticket:</b> {{boarding_pass.ticket}}</h6>
 
-    <p>Passenger first name: {{boarding_pass.passenger_first_name}}</p>
-    <p>Passenger last name: {{boarding_pass.passenger_last_name}}</p>
-    <p>Status: {{boarding_pass.get_status_display}}</p>
+        </br>
+        <p><b>First name:</b> {{boarding_pass.passenger_first_name}}</p>
+        <p><b>Last name:</b> {{boarding_pass.passenger_last_name}}</p>
+        <p><b>Status:</b> {{boarding_pass.get_status_display}}</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Approve"/>
-    </form>
-
-    <br/>
-    <p>Ticket: {{boarding_pass.ticket}}</p>
-    <p>Ticket owner: {{boarding_pass.ticket.passenger}}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Approve"/>
+        </form>
+    </div>
+</div>
 
 {% else %}
 <h2>You do not have access to this page.</h2>

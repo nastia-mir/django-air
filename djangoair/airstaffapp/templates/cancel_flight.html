@@ -3,11 +3,12 @@
 
 {% if request_user_role == 'supervisor' %}
 
-<h2>Are you sure you want to cancel flight {{flight}}?</h2>
+<h4>Are you sure you want to cancel flight {{flight}}?</h4>
 
+</br>
 <form method="POST">
     {% csrf_token %}
-    <input type="submit" class="btn btn-danger" value="Cancel flight"/>
+    <input type="submit" class="btn btn-danger btn-lg" value="Cancel flight"/>
 </form>
 
 {% else %}

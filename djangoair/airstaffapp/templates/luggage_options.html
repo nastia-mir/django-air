@@ -9,12 +9,17 @@
     <input type="submit" value="Create"/>
 </form>
 
+</br>
+<ul class="list-group list-group-flush">
+    {% for luggage in options %}
 
-{% for luggage in options %}
-<p>{{luggage}}
-    <a href="{% url 'staff:delete luggage' luggage.id %}">Delete</a>
-</p>
-{% endfor %}
+    <li class="list-group-item">
+        {{luggage}}
+        <a href="{% url 'staff:delete luggage' luggage.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
 
 {% else %}
 <h2>Only supervisors can access this page.</h2>
