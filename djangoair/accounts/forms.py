@@ -13,12 +13,12 @@ class MyUserCreationForm(UserCreationForm):
             'first_name': TextInput(attrs={'class': 'form-control'}),
             'last_name': TextInput(attrs={'class': 'form-control'}),
             'password1': TextInput(attrs={'class': 'form-control'}),
-            'password2': TextInput(attrs={'class': 'form-control'})
+            'password2': TextInput(attrs={'class': 'form-control'}),
         }
 
 
 class EmailForm(Form):
-    email = EmailField(max_length=200)
+    email = EmailField(max_length=200, widget=TextInput(attrs={'class': 'form-control'}))
 
 
 class EditProfileForm(ModelForm):

@@ -1,4 +1,4 @@
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm, TextInput, Select, NumberInput
 
 from airstaffapp.models import Flight
 
@@ -9,6 +9,12 @@ class TicketForm(ModelForm):
     class Meta:
         model = Flight
         fields = ['destination', 'date', 'passengers']
+
+        widgets = {
+            'destination': Select(attrs={'class': 'form-control'}),
+            'date': Select(attrs={'class': 'form-control'}),
+            'passengers': NumberInput(attrs={'class': 'form-control'})
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,5 +36,6 @@ class CheckInForm(ModelForm):
         widgets = {
             'passenger_first_name': TextInput(attrs={'class': 'form-control'}),
             'passenger_last_name': TextInput(attrs={'class': 'form-control'}),
+            'extra_luggage': NumberInput(attrs={'class': 'form-control'})
         }
 
