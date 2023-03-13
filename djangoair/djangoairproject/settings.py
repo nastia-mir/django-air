@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'accounts',
     'airstaffapp',
     'airuserapp',
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
