@@ -4,7 +4,7 @@
 <form method="POST" id="ticketForm" date-url="{% url 'passengers:ajax load dates' %}" novalidate>
     {% csrf_token %}
     {{form.as_p}}
-    <input type="submit" value="Proceed"/>
+    <input class="btn btn-primary" type="submit" value="Proceed"/>
 </form>
 
 

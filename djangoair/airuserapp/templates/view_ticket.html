@@ -2,38 +2,42 @@
 {% block content %}
 
 {% if request.user.is_authenticated %}
+<div class="card" style="width: 28rem;">
+    <div class="card-body">
 
-    <p>Your ticket:</p>
+        <h5 class="card-title">
+            {{ticket.flight}}
+            {% if ticket.flight.is_canceled %}
+            Canceled.
+            {% endif %}
+        </h5>
+        </br>
 
-    <p>
-        Flight: {{ticket.flight}}
-        {% if ticket.flight.is_canceled %}
-        Canceled.
-        {% endif %}
-    </p>
-    <p>Quantity: {{ticket.tickets_quantity}}</p>
-    <p>Price (per ticket): {{ticket.flight.ticket_price}}$</p>
-    <p>Lunch: {{ticket.lunch}}</p>
-    <p>Luggage: {{ticket.luggage}}</p>
+        <p><b>Passengers:</b> {{ticket.tickets_quantity}}</p>
+        <p><b>Price (per ticket):</b> {{ticket.flight.ticket_price}}$</p>
+        <p><b>Lunch:</b> {{ticket.lunch}}</p>
+        <p><b>Luggage:</b> {{ticket.luggage}}</p>
 
-    <br/>
-    <p>Check-in status: {{ticket.get_check_in_display}}</p>
-    {% if ticket.check_in == 'no_checkin' or ticket.check_in == 'editing' %}
-        <a href="{% url 'passengers:checkin' ticket.id %}">Check-in</a>
+        <br/>
+        <p><b>Check-in status:</b> {{ticket.get_check_in_display}}</p>
+        {% if ticket.check_in == 'no_checkin' or ticket.check_in == 'editing' %}
+        <a href="{% url 'passengers:checkin' ticket.id %}" class="btn btn-outline-primary">Check-in</a>
 
 
-    {% elif ticket.check_in == 'completed' %}
+        {% elif ticket.check_in == 'completed' %}
 
-        <p>Registration status: {{ticket.get_gate_registration_display}}</p>
+        <p><b>Registration status:</b> {{ticket.get_gate_registration_display}}</p>
 
         {% if ticket.gate_registration == 'not_registered' %}
-            <a href="{% url 'passengers:gate register' ticket.id %}">Register</a>
+        <a href="{% url 'passengers:gate register' ticket.id %}" class="btn btn-outline-primary">Register</a>
         {% endif %}
 
-    {% endif %}
+        {% endif %}
+    </div>
+</div>
 
 {% else %}
-    <h2>You need to login to view you tickets details.</h2>
+<h2>You need to login to view you tickets details.</h2>
 {% endif %}
 
 {% endblock %}

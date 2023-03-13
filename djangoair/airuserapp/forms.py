@@ -1,4 +1,4 @@
-from django.forms import ModelForm, ChoiceField, Form, CharField
+from django.forms import ModelForm, TextInput
 
 from airstaffapp.models import Flight
 
@@ -21,11 +21,14 @@ class TicketForm(ModelForm):
             except (ValueError, TypeError):
                 pass
 
-    widgets = {'date': ChoiceField()}
-
 
 class CheckInForm(ModelForm):
     class Meta:
         model = CheckIn
         fields = ['passenger_first_name', 'passenger_last_name', 'extra_luggage']
+
+        widgets = {
+            'passenger_first_name': TextInput(attrs={'class': 'form-control'}),
+            'passenger_last_name': TextInput(attrs={'class': 'form-control'}),
+        }
 

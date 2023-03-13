@@ -3,17 +3,22 @@
 
 {% if request.user.is_authenticated %}
 
-    <p>Your boarding passes:</p>
+    <h5>Your boarding passes:</h5>
 
-    {% for boarding_pass in boarding_passes_list %}
-        <p>{{boarding_pass}}</p>
-    {% endfor %}
+    <ul class="list-group list-group-flush">
+        {% for boarding_pass in boarding_passes_list %}
+            <li class="list-group-item">
+                {{boarding_pass}}
+            </li>
+        {% endfor %}
+    </ul>
+
+    </br>
 
     <form method="POST">
         {% csrf_token %}
-        <input type="submit" value="Register"/>
+        <input class="btn btn-primary"  type="submit" value="Register"/>
     </form>
-
 
 {% else %}
     <h2>You need to login to view you tickets details.</h2>

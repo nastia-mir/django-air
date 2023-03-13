@@ -2,38 +2,45 @@
 {% block content %}
 
 {% if check_in %}
-    <h2>You have already finished your check-in.</h2>
+<h3>You have already finished your check-in.</h3>
 {% else %}
 
-    {% if form %}
-        <form method="POST">
-            {% csrf_token %}
-            {{form.as_p}}
-            <p>You need to add {{left}} more passengers.</p>
-            <input type="submit" name="add_passenger" value="Add passenger"/>
-        </form>
-    {% else %}
+{% if form %}
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <label class="form-label">You need to add {{left}} more passengers.</label> </br>
+    <input class="btn btn-outline-primary" type="submit" name="add_passenger" value="Add passenger"/>
+</form>
+{% else %}
 
-        {% if left == 0 %}
-        <form method="POST">
-            {% csrf_token %}
-            <input type="submit" name="checkin" value="Finish check-in"/>
-        </form>
+{% if left == 0 %}
+<form method="POST">
+    {% csrf_token %}
+    <input class="btn btn-primary" type="submit" name="checkin" value="Finish check-in"/>
+</form>
 
-        {% elif left == -1 %}
-        <p>You entered too many passengers. Please check the data you provided.</p>
-        {% endif %}
+{% elif left == -1 %}
+<p>You entered too many passengers. Please check the data you provided.</p>
+{% endif %}
 
-    {% endif %}
+{% endif %}
 
-    {% if passengers %}
-        {% for passenger in passengers %}
-            <p>
-                {{passenger}}
-                <a href="{% url 'passengers:delete checkin' passenger.id %}">Delete</a>
-            </p>
-        {% endfor %}
-    {% endif %}
+</br>
+
+{% if passengers %}
+
+<ul class="list-group list-group-flush">
+    {% for passenger in passengers %}
+
+    <li class="list-group-item">
+        <p class="me-1">{{passenger}} </p>
+        <a href="{% url 'passengers:delete checkin' passenger.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
+{% endif %}
 {% endif %}
 
 {% endblock %}

@@ -1,26 +1,29 @@
 {% extends 'main.html' %}
 {% block content %}
 
-<h3>Last steps</h3>
+<h5 class="text-decoration-underline">Last steps</h5>
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
 
-<p>Your tickets:</p>
 
-<p>Flight: {{ticket.flight}}</p>
-<p>Quantity: {{ticket.tickets_quantity}}</p>
-<p>Price (per ticket): {{ticket.flight.ticket_price}}$</p>
-<p>Lunch (price per ticket): {{ticket.lunch}}</p>
-<p>Luggage (price per ticket): {{ticket.luggage}}</p>
 
+        <p><b>Flight:</b> {{ticket.flight}}</p>
+        <p><b>Quantity:</b> {{ticket.tickets_quantity}}</p>
+        <p><b>Price (per ticket):</b> {{ticket.flight.ticket_price}}$</p>
+        <p><b>Lunch (price per ticket):</b> {{ticket.lunch}}</p>
+        <p><b>Luggage (price per ticket):</b> {{ticket.luggage}}</p>
+
+        <br/>
+        <p><b>Total price:</b> {{total_price}}$</p>
+
+    </div>
+</div>
 <br/>
-<p>Total price: {{total_price}}$</p>
-<br/>
-
-
 <form method="POST">
     {% csrf_token %}
+    <label class="form-label">You will receive your tickets via email.</label>
     {{form.as_p}}
-    <p>You will receive your tickets via email.</p>
-    <input type="submit" value="Book tickets"/>
+    <input class="btn btn-primary" type="submit" value="Book tickets"/>
 </form>
 
 

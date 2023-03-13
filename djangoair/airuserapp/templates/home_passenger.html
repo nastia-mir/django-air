@@ -2,18 +2,21 @@
 {% block content %}
 
 <br/>
-<a href="{% url 'passengers:tickets' %}">Book tickets</a>
-<br/>
+<a href="{% url 'passengers:tickets' %}" class="btn btn-outline-primary">Book tickets</a>
+<br/><br/>
+
 
 {% if request.user.is_authenticated %}
 
 {% if tickets|length != 0 %}
+<ul class="list-group list-group-flush">
+    {% for ticket in tickets %}
 
-{% for ticket in tickets %}
-<p>
-    <a href="{% url 'passengers:view ticket' ticket.id %}">{{ticket}}</a>
-</p>
-{% endfor %}
+    <li class="list-group-item">
+        <a href="{% url 'passengers:view ticket' ticket.id %}" class="text-decoration-none text-body">{{ticket}}</a>
+    </li>
+    {% endfor %}
+</ul>
 
 {% else %}
 <p>You don't have any tickets yet.</p>
@@ -21,7 +24,7 @@
 
 <br/>
 
-<a href="{% url 'accounts:edit profile' %}">Edit profile</a>
+<a href="{% url 'accounts:edit profile' %}" class="btn btn-outline-secondary">Edit profile</a>
 
 {% else %}
 

@@ -1,11 +1,11 @@
 {% extends 'main.html' %}
 {% block content %}
 
-<h3>{{ticket.flight}}</h3>
+<h5>{{ticket.flight}}</h5>
 
-<p>Yor price for {{ticket.tickets_quantity}} tickets: {{ticket_price}}$</p>
+<p><b>Price</b>: {{ticket_price}}$</p>
 
-<h3>Would you like to add something?</h3>
+<h5>Would you like to add something?</h5>
 
 <form method="POST">
     {% csrf_token %}
@@ -28,7 +28,7 @@
         </select>
     </p>
 
-    <input type="submit" value="Booking"/>
+    <input class="btn btn-primary" type="submit" value="Booking"/>
 </form>
 
 {% endblock %}
