@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from accounts.services import PasswordGenerator
+from accounts.tokens import PasswordGenerator
 
 
 class TestServices(TestCase):

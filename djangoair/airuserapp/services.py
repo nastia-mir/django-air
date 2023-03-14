@@ -2,23 +2,16 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.utils.html import strip_tags
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 from djangoairproject.settings import EMAIL_HOST_USER
 
+from accounts.tokens import account_activation_token
+
 
 class Emails:
-    @classmethod
-    def send_temporary_password(cls, request, email, password):
-        subject = 'Django Air: Temporary password'
-        message = render_to_string("emails/temp_password.txt", {
-            'password': password
-        })
-        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
-        if email:
-            messages.success(request, 'We send you a temporary password. Please, check your email.')
-        else:
-            messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")
-
     @classmethod
     def send_flight_cancellation_info(cls, request, flight, ticket):
         refund = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
@@ -84,3 +77,20 @@ class Emails:
             messages.success(request, 'Register confirmation email is sent.')
         else:
             messages.error(request, "Register confirmation email is not sent.")
+
+    @classmethod
+    def send_password_resetting_link(cls, request, user):
+        subject = 'Django Air: reset password'
+        message = render_to_string("emails/change_password.txt", {
+            'user': user,
+            'domain': get_current_site,
+            'uid': urlsafe_base64_encode(force_bytes(user.id)),
+            'token': account_activation_token.make_token(user),
+            'protocol': 'https' if request.is_secure() else 'http'
+        })
+        print(message)
+        email = send_mail(subject, message, EMAIL_HOST_USER, [user.email])
+        if email:
+            messages.success(request, 'We send you a link to change password via email.')
+        else:
+            messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")

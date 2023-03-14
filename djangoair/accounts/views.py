@@ -1,13 +1,15 @@
 from django.views.generic import FormView
 from django.views.generic.edit import ProcessFormView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 
 from accounts.forms import MyUserCreationForm, EditProfileForm, EmailForm
-from accounts.models import MyUser, Staff, Passenger
-from accounts.services import PasswordGenerator
+from accounts.models import MyUser, Passenger
+from accounts.tokens import account_activation_token
 
 from airuserapp.services import Emails
 
@@ -104,10 +106,7 @@ class RestorePasswordView(ProcessFormView):
             email = form.cleaned_data['email']
             try:
                 user = MyUser.objects.get(email=email)
-                new_password = PasswordGenerator.generate_password()
-                user.set_password(new_password)
-                user.save()
-                Emails.send_temporary_password(request, email, new_password)
+                Emails.send_password_resetting_link(request, user)
                 return redirect('accounts:login')
             except:
                 messages.error(request, 'User with given email does not exist.')
@@ -116,3 +115,33 @@ class RestorePasswordView(ProcessFormView):
         else:
             messages.error(request, 'Please enter valid email.')
             return redirect('accounts:restore password')
+
+
+class ResetPasswordView(ProcessFormView):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = MyUser.objects.get(id=uid)
+        except:
+            user = None
+
+        if user and account_activation_token.check_token(user, token):
+            context = {'form': SetPasswordForm(user)}
+            return render(request, 'reset_password.html', context)
+        else:
+            messages.error('Something went wrong with password resetting link.')
+            return redirect('account:login')
+
+    def post(self, request, uidb64, token):
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = MyUser.objects.get(id=uid)
+        password_form = SetPasswordForm(user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
+            login(request, user)
+            messages.success(request, 'Your password was successfully reset!')
+            return redirect('passengers:home')
+        else:
+            messages.error(request, 'Something went wrong.')
+            return redirect('accounts:change password')
+

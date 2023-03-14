@@ -10,4 +10,5 @@ urlpatterns = [
     path('edit_profile/', login_required(views.EditProfileView.as_view()), name='edit profile'),
     path('change_password/', login_required(views.ChangePasswordView.as_view()), name='change password'),
     path('restore_password/', views.RestorePasswordView.as_view(), name='restore password'),
+    path('restore_password/<uidb64>/<token>/reset_password', views.ResetPasswordView.as_view(), name='reset password')
 ]
