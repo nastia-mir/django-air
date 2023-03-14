@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.contrib.messages import get_messages
 
 from accounts.models import MyUser, Passenger
 
@@ -67,6 +68,7 @@ class TestTicketViews(TestCase):
     def test_ticket_details_POST_valid_data(self):
         response = self.client.post(self.ticket_details_url, self.ticket_details_valid_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.ticket_booking_url)
 
     def test_ticket_booking_GET(self):
         response = self.client.get(self.ticket_booking_url)
@@ -76,14 +78,20 @@ class TestTicketViews(TestCase):
     def test_ticket_booking_POST_valid_email(self):
         response = self.client.post(self.ticket_booking_url, self.booking_valid_email)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.home_url)
 
     def test_ticket_booking_POST_invalid_email(self):
         response = self.client.post(self.ticket_booking_url, self.booking_invalid_email)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.ticket_booking_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("Please enter valid email." in messages[0].message)
 
     def test_view_ticket_GET(self):
         response = self.client.get(self.view_ticket_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/passengers/view_ticket/8/')
 
 
 class TestCheckinGateViews(TestCase):
@@ -131,11 +139,14 @@ class TestCheckinGateViews(TestCase):
     def test_checkin_GET(self):
         response = self.client.get(self.checkin_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/passengers/checkin/1/')
 
     def test_delete_checkin_GET(self):
         response = self.client.get(self.delete_checkin_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/passengers/checkin/delete/2/')
 
     def test_gate_register_GET(self):
         response = self.client.get(self.gate_register_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/passengers/gate/6/')

@@ -13,6 +13,18 @@ from accounts.tokens import account_activation_token
 
 class Emails:
     @classmethod
+    def send_temporary_password(cls, request, email, password):
+        subject = 'Django Air: Temporary password'
+        message = render_to_string("emails/temp_password.txt", {
+            'password': password
+        })
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
+        if email:
+            messages.success(request, 'We send you a temporary password. Please, check your email.')
+        else:
+            messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")
+
+    @classmethod
     def send_flight_cancellation_info(cls, request, flight, ticket):
         refund = ticket.flight.ticket_price * ticket.tickets_quantity + ticket.lunch.price + ticket.luggage.price
         passenger_email = ticket.passenger.user.email

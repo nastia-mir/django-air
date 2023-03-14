@@ -8,7 +8,6 @@ from accounts.models import MyUser
 from accounts.tokens import account_activation_token
 
 
-
 class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
