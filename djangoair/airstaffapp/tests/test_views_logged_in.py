@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.contrib.messages import get_messages
 
 from accounts.models import MyUser, Staff, Passenger
 
@@ -99,6 +100,7 @@ class TestStaffListViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.edit_role_url, self.edit_role_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.staff_list_url)
 
     def test_edit_role_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -146,17 +148,9 @@ class TestLunchLuggageViews(TestCase):
             'description': 'Soup',
             'price': 20
         }
-        self.lunch_data_invalid = {
-            'description': 'Soup',
-            'price': '20'
-        }
         self.luggage_data_valid = {
             'quantity': '0',
             'price': 20
-        }
-        self.luggage_data_invalid = {
-            'quantity': '0',
-            'price': '20'
         }
         return super().setUp()
 
@@ -175,11 +169,7 @@ class TestLunchLuggageViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.lunch_options_url, self.lunch_data_valid)
         self.assertEqual(response.status_code, 302)
-
-    def test_lunch_options_POST_supervisor_invalid_data(self):
-        self.client.post(self.login_url, self.login_data_supervisor)
-        response = self.client.post(self.lunch_options_url, self.lunch_data_invalid)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.lunch_options_url)
 
     def test_lunch_options_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -191,6 +181,7 @@ class TestLunchLuggageViews(TestCase):
         self.client.post(self.lunch_options_url, self.lunch_data_valid)
         response = self.client.get(self.delete_lunch_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.lunch_options_url)
 
     def test_delete_lunch_GET_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -212,11 +203,7 @@ class TestLunchLuggageViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.luggage_options_url, self.luggage_data_valid)
         self.assertEqual(response.status_code, 302)
-
-    def test_luggage_options_POST_supervisor_invalid_data(self):
-        self.client.post(self.login_url, self.login_data_supervisor)
-        response = self.client.post(self.luggage_options_url, self.luggage_data_invalid)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.luggage_options_url)
 
     def test_luggage_options_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -228,6 +215,7 @@ class TestLunchLuggageViews(TestCase):
         self.client.post(self.luggage_options_url, self.luggage_data_valid)
         response = self.client.get(self.delete_luggage_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.luggage_options_url)
 
     def test_delete_luggage_GET_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -337,16 +325,25 @@ class TestFlightsViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.create_flight_url, self.create_flight_valid)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.flights_url)
 
     def test_create_flight_POST_supervisor_invalid_prices(self):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.create_flight_url, self.create_flight_invalid_prices)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.create_flight_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("Something went wrong. Please check if provided data is valid." in messages[0].message)
 
     def test_create_flight_POST_supervisor_invalid_destination(self):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.create_flight_url, self.create_flight_invalid_destination)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.create_flight_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("Something went wrong. Please check if provided data is valid." in messages[0].message)
 
     def test_create_flight_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -379,6 +376,7 @@ class TestFlightsViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.cancel_flight_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.flights_url)
 
     def test_cancel_flight_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -522,11 +520,13 @@ class TestCheckinGateViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.checkin_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.checkin_url)
 
     def test_checkin_POST_checkin_manager_has_access(self):
         self.client.post(self.login_url, self.login_data_checkin_manager)
         response = self.client.post(self.checkin_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.checkin_url)
 
     def test_checkin_POST_gate_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
@@ -571,11 +571,13 @@ class TestCheckinGateViews(TestCase):
         self.client.post(self.login_url, self.login_data_supervisor)
         response = self.client.post(self.gate_register_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.gate_register_url)
 
     def test_gate_register_POST_gate_manager_has_access(self):
         self.client.post(self.login_url, self.login_data_gate_manager)
         response = self.client.post(self.gate_register_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.gate_register_url)
 
     def test_gate_register_POST_checkin_manager_no_access(self):
         self.client.post(self.login_url, self.login_data_checkin_manager)
