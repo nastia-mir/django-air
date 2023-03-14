@@ -111,7 +111,7 @@ class RestorePasswordView(ProcessFormView):
                 Emails.send_temporary_password(request, email, new_password)
                 return redirect('accounts:login')
             except:
-                messages.error(request, 'User with given email do not exist.')
+                messages.error(request, 'User with given email does not exist.')
                 return redirect('accounts:restore password')
 
         else:

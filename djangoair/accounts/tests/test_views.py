@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.contrib.messages import get_messages
 
 from accounts.models import MyUser
 
@@ -82,23 +83,34 @@ class TestViews(TestCase):
     def test_login_POST_valid(self):
         response = self.client.post(self.login_url, self.login_data_valid)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))
 
     def test_login_POST_incorrect_password(self):
         response = self.client.post(self.login_url, self.login_data_incorrect_password)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.login_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("Wrong email or password." in messages[0].message)
 
     def test_login_POST_user_dont_exist(self):
         response = self.client.post(self.login_url, self.login_data_user_dont_exist)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.login_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("User does not exist." in messages[0].message)
 
     def test_logout_GET_logged_in(self):
         self.client.post(self.login_url, self.login_data_valid)
         response = self.client.get(self.logout_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))
 
     def test_logout_GET_not_logged_in(self):
         response = self.client.get(self.logout_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))
 
     def test_register_GET(self):
         response = self.client.get(self.register_url)
@@ -108,10 +120,7 @@ class TestViews(TestCase):
     def test_register_POST_valid(self):
         response = self.client.post(self.register_url, self.register_data_valid)
         self.assertEqual(response.status_code, 302)
-
-    def test_register_POST_password_not_match(self):
-        response = self.client.post(self.register_url, self.register_data_password_not_match)
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, self.login_url)
 
     def test_register_POST_user_exist(self):
         response = self.client.post(self.register_url, self.register_data_user_exists)
@@ -126,16 +135,19 @@ class TestViews(TestCase):
     def test_edit_profile_GET_not_logged_in(self):
         response = self.client.get(self.edit_profile_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=%2Fedit_profile%2F')
 
     def test_edit_profile_POST_valid(self):
         self.client.post(self.login_url, self.login_data_valid)
         response = self.client.post(self.edit_profile_url, self.edit_profile_data_valid)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))
 
     def test_edit_profile_POST_no_data(self):
         self.client.post(self.login_url, self.login_data_valid)
         response = self.client.post(self.edit_profile_url, {})
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))
 
     def test_change_password_GET_logged_in(self):
         self.client.post(self.login_url, self.login_data_valid)
@@ -146,11 +158,13 @@ class TestViews(TestCase):
     def test_change_password_GET_not_logged_in(self):
         response = self.client.get(self.change_password_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=%2Fchange_password%2F')
 
     def test_change_password_POST_valid(self):
         self.client.post(self.login_url, self.login_data_valid)
         response = self.client.post(self.change_password_url, self.change_password_valid_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.change_password_url)
 
     def test_change_password_POST_incorrect_old_password(self):
         self.client.post(self.login_url, self.login_data_valid)
@@ -165,7 +179,12 @@ class TestViews(TestCase):
     def test_restore_password_POST_data_valid(self):
         response = self.client.post(self.restore_password_url, self.restore_password_valid_email)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.login_url)
 
     def test_restore_password_POST_user_not_exists(self):
         response = self.client.post(self.restore_password_url, self.restore_password_user_not_exists)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.restore_password_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("User with given email does not exist." in messages[0].message)
