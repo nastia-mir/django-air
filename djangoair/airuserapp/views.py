@@ -41,7 +41,7 @@ class SearchTicketsView(CreateView):
         passengers = request.POST.get('passengers')
 
         flight = Flight.objects.get(destination=destination, date=date, is_canceled=False)
-        sold_tickets = len(Ticket.objects.filter(flight=flight).all())
+        sold_tickets = Ticket.objects.filter(flight=flight).all().count()
         if int(passengers) <= flight.passengers-sold_tickets:
             ticket = Ticket.objects.create(flight=flight, tickets_quantity=passengers)
             return redirect(reverse('passengers:ticket details', args={ticket.id}))

@@ -6,7 +6,7 @@ from accounts.models import MyUser
 class MyUserCreationForm(UserCreationForm):
     class Meta:
         model = MyUser
-        fields = ['email', 'first_name', 'last_name', 'password1', 'password2', 'is_airlines_staff']
+        fields = ['email', 'first_name', 'last_name', 'password1', 'password2']
 
         widgets = {
             'email': TextInput(attrs={'class': 'form-control'}),
