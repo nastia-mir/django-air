@@ -79,8 +79,8 @@ class TestViews(TestCase):
         self.reset_password_url = reverse('accounts:reset password',
                                           args={urlsafe_base64_encode(force_bytes(self.user.id)),
                                                 account_activation_token.make_token(self.user)})
-        self.reset_password_data = {'password1': 'newpassword',
-                                    'password2': 'newpassword'}
+        self.reset_password_data = {'new_password1': 'newpassword',
+                                    'new_password2': 'newpassword'}
 
         return super().setUp()
 
