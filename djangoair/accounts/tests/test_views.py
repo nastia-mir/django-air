@@ -1,8 +1,12 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 from accounts.models import MyUser
+from accounts.tokens import account_activation_token
+
 
 
 class TestViews(TestCase):
@@ -72,6 +76,12 @@ class TestViews(TestCase):
 
         self.restore_password_valid_email = {'email': 'test@gmail.com'}
         self.restore_password_user_not_exists = {'email': 'testnotexists@gmail.com'}
+
+        self.reset_password_url = reverse('accounts:reset password',
+                                          args={urlsafe_base64_encode(force_bytes(self.user.id)),
+                                                account_activation_token.make_token(self.user)})
+        self.reset_password_data = {'password1': 'newpassword',
+                                    'password2': 'newpassword'}
 
         return super().setUp()
 
@@ -170,6 +180,10 @@ class TestViews(TestCase):
         self.client.post(self.login_url, self.login_data_valid)
         response = self.client.post(self.change_password_url, self.change_password_incorrect_old_password)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.change_password_url)
+        messages = [msg for msg in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0].tags, "error")
+        self.assertTrue("Something went wrong." in messages[0].message)
 
     def test_restore_password_GET(self):
         response = self.client.get(self.restore_password_url)
@@ -188,3 +202,13 @@ class TestViews(TestCase):
         messages = [msg for msg in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0].tags, "error")
         self.assertTrue("User with given email does not exist." in messages[0].message)
+
+    def test_reset_password_GET(self):
+        response = self.client.get(self.reset_password_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'reset_password.html')
+
+    def test_reset_password_POST(self):
+        response = self.client.post(self.reset_password_url, self.reset_password_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('passengers:home'))

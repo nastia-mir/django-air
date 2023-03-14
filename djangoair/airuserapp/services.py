@@ -88,7 +88,6 @@ class Emails:
             'token': account_activation_token.make_token(user),
             'protocol': 'https' if request.is_secure() else 'http'
         })
-        print(message)
         email = send_mail(subject, message, EMAIL_HOST_USER, [user.email])
         if email:
             messages.success(request, 'We send you a link to change password via email.')

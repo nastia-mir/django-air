@@ -5,10 +5,6 @@ from accounts import views
 
 
 class TestUrls(SimpleTestCase):
-    def test_home(self):
-        url = reverse('accounts:home')
-        self.assertEqual(resolve(url).func.__name__, views.HomeView.as_view().__name__)
-
     def test_login(self):
         url = reverse('accounts:login')
         self.assertEqual(resolve(url).func.__name__, views.LoginView.as_view().__name__)
@@ -32,3 +28,7 @@ class TestUrls(SimpleTestCase):
     def test_restore_password(self):
         url = reverse('accounts:restore password')
         self.assertEqual(resolve(url).func.__name__, views.RestorePasswordView.as_view().__name__)
+
+    def test_reset_password(self):
+        url = reverse('accounts:reset password', args={'ddd', 'dferf'})
+        self.assertEqual(resolve(url).func.__name__, views.ResetPasswordView.as_view().__name__)

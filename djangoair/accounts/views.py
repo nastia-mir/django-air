@@ -143,5 +143,5 @@ class ResetPasswordView(ProcessFormView):
             return redirect('passengers:home')
         else:
             messages.error(request, 'Something went wrong.')
-            return redirect('accounts:change password')
+            return redirect('accounts:reset password', args={uidb64, token})
 
