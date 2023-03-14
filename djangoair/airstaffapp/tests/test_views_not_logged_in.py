@@ -17,6 +17,7 @@ class TestHomeView(TestCase):
     def test_home_GET(self):
         response = self.client.get(self.home_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/')
 
 
 class TestStaffListViews(TestCase):
@@ -39,10 +40,12 @@ class TestStaffListViews(TestCase):
     def test_staff_list_GET(self):
         response = self.client.get(self.staff_list_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/staff_list/')
 
     def test_edit_role_GET(self):
         response = self.client.get(self.edit_role_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/staff_list/1/')
 
 
 class TestLunchLuggageViews(TestCase):
@@ -66,18 +69,22 @@ class TestLunchLuggageViews(TestCase):
     def test_lunch_options_GET(self):
         response = self.client.get(self.lunch_options_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/lunch/')
 
     def test_delete_lunch_GET(self):
         response = self.client.get(self.delete_lunch_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/lunch/1/delete/')
 
     def test_luggage_options_GET(self):
         response = self.client.get(self.luggage_options_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/luggage/')
 
     def test_delete_luggage_GET(self):
         response = self.client.get(self.delete_luggage_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/luggage/1/delete/')
 
 
 class TestFlightsViews(TestCase):
@@ -102,22 +109,27 @@ class TestFlightsViews(TestCase):
     def test_flights_GET(self):
         response = self.client.get(self.flights_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/flights/')
 
     def test_create_flights_GET(self):
         response = self.client.get(self.create_flight_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/flights/create/')
 
     def test_flights_details_GET(self):
         response = self.client.get(self.flight_details_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/flights/1/details/')
 
     def test_cancel_flight_GET(self):
         response = self.client.get(self.cancel_flight_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/flights/1/cancel/')
 
     def test_cancelled_flights_GET(self):
         response = self.client.get(self.canceled_flights_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/flights/canceled/')
 
 
 class TestCheckinGateViews(TestCase):
@@ -166,15 +178,19 @@ class TestCheckinGateViews(TestCase):
     def test_checkin_list_GET(self):
         response = self.client.get(self.checkin_list_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/checkin/')
 
     def test_checkin_GET(self):
         response = self.client.get(self.checkin_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/checkin/1/')
 
     def test_gate_list_GET(self):
         response = self.client.get(self.gate_list_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/gate/')
 
     def test_gate_register_GET(self):
         response = self.client.get(self.gate_register_url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/staff/gate/1/')
