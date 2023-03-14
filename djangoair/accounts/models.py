@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
+from accounts.model_fields import LowercaseEmailField
+
 
 class MyUserManager(BaseUserManager):
 
@@ -18,7 +20,7 @@ class MyUserManager(BaseUserManager):
 
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=254, unique=True)
+    email = LowercaseEmailField(max_length=254, unique=True)
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
     is_airlines_staff = models.BooleanField(default=False)

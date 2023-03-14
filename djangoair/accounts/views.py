@@ -46,7 +46,6 @@ class RegisterView(FormView):
             return redirect('accounts:register')
         except:
             user = form.save(commit=False)
-            #user.email = user.email.lower()
             user.save()
             passenger_account = Passenger.objects.create(user=user)
             passenger_account.save()
