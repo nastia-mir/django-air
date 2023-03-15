@@ -1,11 +1,19 @@
 from pathlib import Path
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i#jlchhwsjo^h)&tdv6ompcdqo2_m=p%bo+n-j2of4h4-wa$20'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -64,14 +72,13 @@ WSGI_APPLICATION = 'djangoairproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'djangoair',
-        'USER': 'postgres',
-        'PASSWORD': '1111',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env('POSTGRES_NAME'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
-
 
 # Password validation
 
@@ -95,7 +102,6 @@ AUTH_USER_MODEL = 'accounts.MyUser'
 
 LOGIN_URL = 'accounts:login'
 LOGOUT_URL = 'accounts:logout'
-#LOGIN_REDIRECT_URL = 'home'
 
 # Internationalization
 
@@ -126,7 +132,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'nastasia.ua@gmail.com'
 EMAIL_HOST_PASSWORD = 'zzwwokjdrkwmmknt'
 
-PASSWORD_RESET_TIMEOUT = 14400
+PASSWORD_RESET_TIMEOUT = 300
 
 
 # Cache

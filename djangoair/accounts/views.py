@@ -13,7 +13,6 @@ from accounts.tokens import account_activation_token
 
 from airuserapp.services import Emails
 
-
 class LoginView(ProcessFormView):
     def post(self, request):
         email = request.POST.get('email')
