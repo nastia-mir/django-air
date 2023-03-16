@@ -1,7 +1,18 @@
+from enum import Enum
+
 from django.db import models
 
 from airstaffapp.models import Flight, LunchOptions, LuggageOptions
 from accounts.models import Passenger
+
+
+class StatusOptions(Enum):
+    no_checkin = 'no_checkin'
+    editing = 'editing'
+    waiting_for_approval = 'waiting_for_approval'
+    completed = 'completed'
+    not_registered = 'not_registered'
+    in_progress = 'in_progress'
 
 
 class Ticket(models.Model):
@@ -12,20 +23,20 @@ class Ticket(models.Model):
     luggage = models.ForeignKey(LuggageOptions, on_delete=models.CASCADE, related_name='luggage', null=True)
 
     checkin_options = (
-        ('no_checkin', 'No check-in'),
-        ('editing', 'Editing'),  # check-in requests not for all passengers from ticket
-        ('waiting_for_approval', 'Waiting for approval'),
-        ('completed', 'Completed')
+        (StatusOptions.no_checkin.value, 'No check-in'),
+        (StatusOptions.editing.value, 'Editing'),  # check-in requests not for all passengers from ticket
+        (StatusOptions.waiting_for_approval.value, 'Waiting for approval'),
+        (StatusOptions.completed.value, 'Completed')
     )
-    check_in = models.CharField(max_length=150, choices=checkin_options, default='no_checkin')
+    check_in = models.CharField(max_length=150, choices=checkin_options, default=StatusOptions.no_checkin.value)
 
     gate_registration_options = (
-        ('not_registered', 'Not registered'),
-        ('waiting_for_approval', 'Waiting for approval'),
-        ('completed', 'Completed')
+        (StatusOptions.not_registered.value, 'Not registered'),
+        (StatusOptions.waiting_for_approval.value, 'Waiting for approval'),
+        (StatusOptions.completed.value, 'Completed')
     )
 
-    gate_registration = models.CharField(max_length=150, choices=gate_registration_options, default='not_registered')
+    gate_registration = models.CharField(max_length=150, choices=gate_registration_options, default=StatusOptions.not_registered.value)
 
     objects = models.Manager()
 
@@ -39,10 +50,10 @@ class CheckIn(models.Model):
     passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
     extra_luggage = models.IntegerField(default=0)
     status_choices = (
-        ('in_progress', 'In progress'),
-        ('completed', 'Completed')
+        (StatusOptions.in_progress.value, 'In progress'),
+        (StatusOptions.completed.value, 'Completed')
     )
-    status = models.CharField(max_length=100, choices=status_choices, default='in_progress')
+    status = models.CharField(max_length=100, choices=status_choices, default=StatusOptions.in_progress.value)
 
     objects = models.Manager()
 
@@ -58,11 +69,11 @@ class BoardingPass(models.Model):
     code = models.CharField(max_length=10, blank=False, null=False)
 
     status_choices = (
-        ('not_registered', 'Not registered'),
-        ('in_progress', 'In progress'),
-        ('completed', 'Completed')
+        (StatusOptions.not_registered.value, 'Not registered'),
+        (StatusOptions.in_progress.value, 'In progress'),
+        (StatusOptions.completed.value, 'Completed')
     )
-    status = models.CharField(max_length=100, choices=status_choices, default='not_registered')
+    status = models.CharField(max_length=100, choices=status_choices, default=StatusOptions.not_registered.value)
 
     objects = models.Manager()
 

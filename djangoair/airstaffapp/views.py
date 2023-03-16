@@ -10,7 +10,7 @@ from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm, DateForm
 from airstaffapp.services import CreateBoardingPass
 
-from airuserapp.models import Ticket, CheckIn, BoardingPass
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions
 from airuserapp.services import Emails
 
 
@@ -129,7 +129,6 @@ class LuggageOptionsView(UserPassesTestMixin, CreateView):
     def get(self, request):
         context = {
             'options': LuggageOptions.objects.all(),
-            'request_user_role': Staff.objects.get(user=request.user).role,
             'form': LuggageOptionsForm
         }
         return render(request, 'luggage_options.html', context)
@@ -176,7 +175,6 @@ class CreateFlightView(UserPassesTestMixin, CreateView):
 
     def get(self, request):
         context = {
-            'request_user_role': Staff.objects.get(user=request.user).role,
             'flight_form': FlightCreationForm,
             'date_form': DateForm
         }
@@ -213,7 +211,6 @@ class FlightDetailsView(UserPassesTestMixin, TemplateView):
         context['flight'] = flight
         context['luggage'] = list(luggage)
         context['lunch'] = list(lunch)
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
@@ -261,7 +258,7 @@ class CanceledFLightsListView(UserPassesTestMixin, ListView):
 
 class CheckInListView(UserPassesTestMixin, ListView):
     template_name = 'checkin_list.html'
-    queryset = CheckIn.objects.filter(status='in_progress')
+    queryset = CheckIn.objects.filter(status=StatusOptions.in_progress.value)
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
@@ -285,13 +282,13 @@ class CheckInView(UserPassesTestMixin, ProcessFormView):
 
     def post(self, request, pk):
         checkin = CheckIn.objects.get(id=pk)
-        checkin.status = 'completed'
+        checkin.status = StatusOptions.completed.value
         checkin.save()
         CreateBoardingPass.create_boarding_pass(checkin)
         try:
-            no_checkin = CheckIn.objects.filter(ticket=checkin.ticket, status='in_progress')[0]
+            no_checkin = CheckIn.objects.filter(ticket=checkin.ticket, status=StatusOptions.in_progress.value)[0]
         except:
-            checkin.ticket.check_in = 'completed'
+            checkin.ticket.check_in = StatusOptions.completed.value
             checkin.ticket.save()
             boarding_passes_list = list(BoardingPass.objects.filter(ticket=checkin.ticket).all())
             email = checkin.ticket.passenger.user.email
@@ -308,7 +305,7 @@ class CheckInView(UserPassesTestMixin, ProcessFormView):
 
 class GateListView(UserPassesTestMixin, ListView):
     template_name = 'gate_list.html'
-    queryset = BoardingPass.objects.filter(status='in_progress')
+    queryset = BoardingPass.objects.filter(status=StatusOptions.in_progress.value)
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
@@ -331,12 +328,13 @@ class GateView(UserPassesTestMixin, ProcessFormView):
 
     def post(self, request, pk):
         boarding_pass = BoardingPass.objects.get(id=pk)
-        boarding_pass.status = 'completed'
+        boarding_pass.status = StatusOptions.completed.value
         boarding_pass.save()
         try:
-            not_registered = BoardingPass.objects.filter(ticket=boarding_pass.ticket, status='in_progress')[0]
+            not_registered = BoardingPass.objects.filter(ticket=boarding_pass.ticket,
+                                                         status=StatusOptions.in_progress.value)[0]
         except:
-            boarding_pass.ticket.gate_registration = 'completed'
+            boarding_pass.ticket.gate_registration = StatusOptions.completed.value
             boarding_pass.ticket.save()
             email = boarding_pass.ticket.passenger.user.email
             Emails.seng_gate_register_confirmation(request, email)

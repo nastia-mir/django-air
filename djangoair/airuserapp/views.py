@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm, CheckInForm
-from airuserapp.models import Ticket, CheckIn, BoardingPass
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions
 from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -144,7 +144,7 @@ class CheckInView(ProcessFormView):
     def get(self, request, pk):
         ticket = Ticket.objects.get(id=pk)
         context = {}
-        if ticket.check_in == 'waiting_for_approval' or ticket.check_in == 'completed':
+        if ticket.check_in in [StatusOptions.waiting_for_approval.value, StatusOptions.completed.value]:
             context['check_in'] = True
         else:
             context['ticket'] = ticket
@@ -160,7 +160,6 @@ class CheckInView(ProcessFormView):
                 else:
                     context['form'] = None
                     context['left'] = -1
-
             else:
                 context['passengers'] = None
                 context['form'] = CheckInForm
@@ -176,14 +175,14 @@ class CheckInView(ProcessFormView):
                 checkin_form = form.save(commit=False)
                 checkin_form.ticket = ticket
                 checkin_form.save()
-                if ticket.check_in != 'editing':
-                    ticket.check_in = 'editing'
+                if ticket.check_in != StatusOptions.editing.value:
+                    ticket.check_in = StatusOptions.editing.value
                     ticket.save()
             else:
                 messages.error(request, 'Please enter valid data.')
             return redirect(reverse('passengers:checkin', args={pk}))
         elif 'checkin' in request.POST:
-            ticket.check_in = 'waiting_for_approval'
+            ticket.check_in = StatusOptions.waiting_for_approval.value
             ticket.save()
             return redirect(reverse('passengers:view ticket', args={pk}))
 
@@ -204,9 +203,9 @@ class GateRegisterView(ProcessFormView):
     def post(self, request, pk):
         ticket = Ticket.objects.get(id=pk)
         for boarding_pass in list(BoardingPass.objects.filter(ticket=ticket)):
-            boarding_pass.status = 'in_progress'
+            boarding_pass.status = StatusOptions.in_progress.value
             boarding_pass.save()
-        ticket.gate_registration = 'waiting_for_approval'
+        ticket.gate_registration = StatusOptions.waiting_for_approval.value
         ticket.save()
         return redirect(reverse('passengers:view ticket', args={pk}))
 
