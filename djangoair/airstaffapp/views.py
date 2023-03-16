@@ -3,7 +3,6 @@ from django.views.generic.edit import ProcessFormView
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
-from django.core.cache import cache
 
 from accounts.models import Staff
 
@@ -261,14 +260,13 @@ class CheckInView(UserPassesTestMixin, ProcessFormView):
 
     def get(self, request, pk):
         checkin = CheckIn.objects.get(id=pk)
-        cache.set('checkin', checkin, 30)
         context = {'checkin': checkin,
                    'extra_luggage_price': checkin.ticket.flight.extra_luggage_price * checkin.extra_luggage,
                    'request_user_role': Staff.objects.get(user=self.request.user).role}
         return render(request, 'checkin.html', context)
 
     def post(self, request, pk):
-        checkin = cache.get('checkin')
+        checkin = CheckIn.objects.get(id=pk)
         checkin.status = 'completed'
         checkin.save()
         CreateBoardingPass.create_boarding_pass(checkin)
@@ -311,19 +309,18 @@ class GateView(UserPassesTestMixin, ProcessFormView):
 
     def get(self, request, pk):
         boarding_pass = BoardingPass.objects.get(id=pk)
-        cache.set('boarding_pass', boarding_pass, 30)
         context = {'boarding_pass': boarding_pass,
                    'request_user_role': Staff.objects.get(user=self.request.user).role}
         return render(request, 'gate_approve.html', context)
 
     def post(self, request, pk):
-        boarding_pass = cache.get('boarding_pass')
+        boarding_pass = BoardingPass.objects.get(id=pk)
         boarding_pass.status = 'completed'
         boarding_pass.save()
         try:
             not_registered = BoardingPass.objects.filter(ticket=boarding_pass.ticket, status='in_progress')[0]
         except:
-            boarding_pass.ticket.gate_registration_options = 'completed'
+            boarding_pass.ticket.gate_registration = 'completed'
             boarding_pass.ticket.save()
             email = boarding_pass.ticket.passenger.user.email
             Emails.seng_gate_register_confirmation(request, email)
