@@ -1,17 +1,11 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' %}
-
 <form method="POST" action="">
     {% csrf_token %}
     {{date_form.as_p}}
     {{flight_form.as_p}}
     <input class="btn btn-primary" type="submit" value="Create flight"/>
 </form>
-
-{% else %}
-<h2>Only supervisors can access this page.</h2>
-{% endif %}
 
 {% endblock %}

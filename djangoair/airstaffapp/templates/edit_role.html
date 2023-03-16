@@ -1,7 +1,7 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' %}
+{% if is_supervisor %}
 
 <h5>{{person.user.first_name}} {{person.user.last_name}}</h5>
 </br>

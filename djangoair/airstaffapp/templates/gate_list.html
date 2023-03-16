@@ -1,8 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' or request_user_role == 'gate_manager' %}
-
 <ul class="list-group list-group-flush">
     {% for register_request in object_list  %}
 
@@ -13,9 +11,5 @@
 
     {% endfor %}
 </ul>
-
-{% else %}
-<h2>You do not have access to this page.</h2>
-{% endif %}
 
 {% endblock %}

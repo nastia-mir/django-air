@@ -1,8 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' %}
-
 <p><a href="{% url 'staff:create flight' %}" class="btn btn-outline-primary">Create new flight</a></p>
 
 {% if empty %}
@@ -25,9 +23,5 @@
 
 </br>
 <a href="{% url 'staff:canceled flights' %}" class="btn btn-outline-secondary">Canceled flights.</a>
-
-{% else %}
-<h2>Only supervisors can access this page.</h2>
-{% endif %}
 
 {% endblock %}

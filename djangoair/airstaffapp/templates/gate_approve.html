@@ -1,7 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' or request_user_role == 'gate_manager' %}
 <div class="card" style="width: 36rem;">
     <div class="card-body">
 
@@ -19,9 +18,5 @@
         </form>
     </div>
 </div>
-
-{% else %}
-<h2>You do not have access to this page.</h2>
-{% endif %}
 
 {% endblock %}

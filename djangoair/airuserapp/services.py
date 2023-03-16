@@ -34,9 +34,9 @@ class Emails:
         message = render_to_string("emails/flight_cancellation.txt", context)
         email = send_mail(subject, message, EMAIL_HOST_USER, [passenger_email])
         if email:
-            messages.success(request, 'Email if sent.')
+            messages.success(request, 'Emails to passengers are sent.')
         else:
-            messages.error(request, "Email is not sent.")
+            messages.error(request, "Emails  to passengers are not sent.")
 
     @classmethod
     def send_ticket_details(cls, request, email, ticket):

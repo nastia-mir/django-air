@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 
-from accounts.models import Staff
+from accounts.models import Staff, RoleOptions
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from airstaffapp.forms import StaffRoleEditForm, FlightCreationForm, LunchOptionsForm, LuggageOptionsForm, DateForm
@@ -19,7 +19,22 @@ class HomeView(TemplateView):
 
     def get_context_data(self):
         context = super(HomeView, self).get_context_data()
-        context['role'] = Staff.objects.get(user=self.request.user).role
+        role = Staff.objects.get(user=self.request.user).role
+        if role:
+            context['role'] = True
+        else:
+            context['role'] = False
+        if role == RoleOptions.supervisor.value:
+            context['is_supervisor'] = True
+            context['is_gate_manager'] = True
+            context['is_checkin_manager'] = True
+        elif role == RoleOptions.checkin_manager.value:
+            context['is_supervisor'] = False
+            context['is_gate_manager'] = False
+            context['is_checkin_manager'] = True
+        elif role == RoleOptions.gate_manager.value:
+            context['is_supervisor'] = False
+            context['is_gate_manager'] = True
         return context
 
 
@@ -28,17 +43,21 @@ class StaffListView(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_context_data(self):
         context = super(StaffListView, self).get_context_data()
         staff = Staff.objects.all()
         editable_staff = []
         for person in staff:
-            if person.role != 'supervisor':
+            if person.role != RoleOptions.supervisor.value:
                 editable_staff.append(person)
         context['staff'] = editable_staff
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        if request_user_role == RoleOptions.supervisor.value:
+            context['is_supervisor'] = True
+        else:
+            context['is_supervisor'] = False
         return context
 
 
@@ -49,7 +68,7 @@ class EditRoleView(UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_success_url(self):
         return reverse('staff:staff list')
@@ -58,7 +77,11 @@ class EditRoleView(UserPassesTestMixin, UpdateView):
         context = super(EditRoleView, self).get_context_data()
         person = Staff.objects.get(id=self.kwargs['pk'])
         context['person'] = person
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
+        request_user_role = Staff.objects.get(user=self.request.user).role
+        if request_user_role == RoleOptions.supervisor.value:
+            context['is_supervisor'] = True
+        else:
+            context['is_supervisor'] = False
         return context
 
     def form_valid(self, form):
@@ -70,7 +93,7 @@ class EditRoleView(UserPassesTestMixin, UpdateView):
 class LunchOptionsView(UserPassesTestMixin, CreateView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get(self, request):
         context = {
@@ -90,7 +113,7 @@ class LunchOptionsView(UserPassesTestMixin, CreateView):
 class LunchOptionsDeleteView(UserPassesTestMixin, DeleteView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get(self, request, pk):
         lunch = LunchOptions.objects.get(id=pk)
@@ -101,7 +124,7 @@ class LunchOptionsDeleteView(UserPassesTestMixin, DeleteView):
 class LuggageOptionsView(UserPassesTestMixin, CreateView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get(self, request):
         context = {
@@ -121,7 +144,7 @@ class LuggageOptionsView(UserPassesTestMixin, CreateView):
 class LuggageOptionsDeleteView(UserPassesTestMixin, DeleteView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get(self, request, pk):
         luggage = LuggageOptions.objects.get(id=pk)
@@ -134,12 +157,11 @@ class FlightsView(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_context_data(self):
         context = super(FlightsView, self).get_context_data()
         flights = Flight.objects.all().order_by('date')
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         if len(flights) == 0:
             context['empty'] = True
         else:
@@ -150,7 +172,7 @@ class FlightsView(UserPassesTestMixin, TemplateView):
 class CreateFlightView(UserPassesTestMixin, CreateView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get(self, request):
         context = {
@@ -181,7 +203,7 @@ class FlightDetailsView(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_context_data(self, pk):
         context = super(FlightDetailsView, self).get_context_data()
@@ -202,12 +224,11 @@ class CancelFlightView(UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_context_data(self):
         context = super(CancelFlightView, self).get_context_data()
         context['flight'] = Flight.objects.get(id=self.kwargs['pk'])
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
     def post(self, request, pk):
@@ -231,11 +252,10 @@ class CanceledFLightsListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role == 'supervisor'
+        return request_user_role == RoleOptions.supervisor.value
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(CanceledFLightsListView, self).get_context_data()
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
@@ -245,24 +265,22 @@ class CheckInListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role in ['supervisor', 'checkin_manager']
+        return request_user_role in [RoleOptions.supervisor.value, RoleOptions.checkin_manager.value]
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(CheckInListView, self).get_context_data()
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
 class CheckInView(UserPassesTestMixin, ProcessFormView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role in ['supervisor', 'checkin_manager']
+        return request_user_role in [RoleOptions.supervisor.value, RoleOptions.checkin_manager.value]
 
     def get(self, request, pk):
         checkin = CheckIn.objects.get(id=pk)
         context = {'checkin': checkin,
-                   'extra_luggage_price': checkin.ticket.flight.extra_luggage_price * checkin.extra_luggage,
-                   'request_user_role': Staff.objects.get(user=self.request.user).role}
+                   'extra_luggage_price': checkin.ticket.flight.extra_luggage_price * checkin.extra_luggage}
         return render(request, 'checkin.html', context)
 
     def post(self, request, pk):
@@ -294,23 +312,21 @@ class GateListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role in ['supervisor', 'gate_manager']
+        return request_user_role in [RoleOptions.supervisor.value, RoleOptions.gate_manager.value]
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(GateListView, self).get_context_data()
-        context['request_user_role'] = Staff.objects.get(user=self.request.user).role
         return context
 
 
 class GateView(UserPassesTestMixin, ProcessFormView):
     def test_func(self):
         request_user_role = Staff.objects.get(user=self.request.user).role
-        return request_user_role in ['supervisor', 'gate_manager']
+        return request_user_role in [RoleOptions.supervisor.value, RoleOptions.gate_manager.value]
 
     def get(self, request, pk):
         boarding_pass = BoardingPass.objects.get(id=pk)
-        context = {'boarding_pass': boarding_pass,
-                   'request_user_role': Staff.objects.get(user=self.request.user).role}
+        context = {'boarding_pass': boarding_pass}
         return render(request, 'gate_approve.html', context)
 
     def post(self, request, pk):

@@ -1,8 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
 
-{% if request_user_role == 'supervisor' %}
-
 <div class="card" style="width: 36rem;">
     <div class="card-body">
 
@@ -40,10 +38,5 @@
 
 </br>
 <a href="{% url 'staff:flights' %}" class="btn btn-outline-secondary">Back to flight list</a>
-
-
-{% else %}
-<h2>Only supervisors can access this page.</h2>
-{% endif %}
 
 {% endblock %}

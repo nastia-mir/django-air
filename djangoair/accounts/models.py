@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -43,13 +45,19 @@ class Passenger(models.Model):
         return '{}'.format(self.user)
 
 
+class RoleOptions(Enum):
+    gate_manager = 'gate_manager'
+    checkin_manager = 'checkin_manager'
+    supervisor = 'supervisor'
+
+
 class Staff(models.Model):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE,  related_name="staff")
 
     roles = (
-        ('gate_manager', 'Gate manager'),
-        ('checkin_manager', 'Checkin manager'),
-        ('supervisor', 'Supervisor')
+        (RoleOptions.gate_manager.value, 'Gate manager'),
+        (RoleOptions.checkin_manager.value, 'Checkin manager'),
+        (RoleOptions.supervisor.value, 'Supervisor')
     )
     role = models.CharField(max_length=50, choices=roles, blank=True)
 
