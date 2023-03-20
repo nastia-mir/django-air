@@ -31,11 +31,10 @@ class TicketForm(ModelForm):
 class CheckInForm(ModelForm):
     class Meta:
         model = CheckIn
-        fields = ['passenger_first_name', 'passenger_last_name', 'extra_luggage']
+        fields = ['extra_luggage']
 
         widgets = {
-            'passenger_first_name': TextInput(attrs={'class': 'form-control'}),
-            'passenger_last_name': TextInput(attrs={'class': 'form-control'}),
+
             'extra_luggage': NumberInput(attrs={'class': 'form-control'})
         }
 

@@ -14,8 +14,11 @@ from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions
 from airuserapp.services import Emails
 
 
-class HomeView(TemplateView):
+class HomeView(UserPassesTestMixin, TemplateView):
     template_name = "home_staff.html"
+
+    def test_func(self):
+        return self.request.user.is_airlines_staff
 
     def get_context_data(self):
         context = super(HomeView, self).get_context_data()

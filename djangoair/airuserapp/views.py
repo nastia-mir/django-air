@@ -1,5 +1,8 @@
+import json
+import stripe
+
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
-from django.views.generic.edit import ProcessFormView
+from django.views.generic.edit import ProcessFormView, View
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
@@ -12,6 +15,11 @@ from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 from accounts.forms import EmailForm
 from accounts.models import MyUser, Passenger
 from accounts.services import PasswordGenerator
+
+from djangoairproject import settings
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class HomeView(TemplateView):
@@ -41,7 +49,7 @@ class SearchTicketsView(CreateView):
 
         flight = Flight.objects.get(destination=destination, date=date, is_canceled=False)
         sold_tickets = Ticket.objects.filter(flight=flight).count()
-        if int(passengers) <= flight.passengers-sold_tickets:
+        if int(passengers) <= flight.passengers - sold_tickets:
             ticket = Ticket.objects.create(flight=flight, tickets_quantity=passengers)
             return redirect(reverse('passengers:ticket details', args={ticket.id}))
         else:
@@ -49,7 +57,7 @@ class SearchTicketsView(CreateView):
             return redirect('passengers:tickets')
 
 
-#ajax
+# ajax
 def load_dates(request):
     destination = request.GET.get('destination')
     flights = list(Flight.objects.filter(destination=destination, is_canceled=False))
@@ -137,7 +145,29 @@ class ViewTicketView(TemplateView):
         context = super(ViewTicketView, self).get_context_data()
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
         context['ticket'] = ticket
+        total_price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
+        context['total_price'] = total_price
         return context
+
+
+class ProcessPaymentView(View):
+
+    def post(self, request, pk, price):
+        customer = stripe.Customer.create(
+            email=request.user.email,
+            source=request.POST.get('stripeToken')
+        )
+
+        charge = stripe.Charge.create(
+            customer=customer,
+            amount=price * 100,
+            currency='usd',
+            description='Ticket payment',
+        )
+        ticket = Ticket.objects.get(id=pk)
+        ticket.is_paid = True
+
+        return redirect(reverse('passengers:view ticket', args={pk}))
 
 
 class CheckInView(ProcessFormView):
@@ -208,14 +238,3 @@ class GateRegisterView(ProcessFormView):
         ticket.gate_registration = StatusOptions.waiting_for_approval.value
         ticket.save()
         return redirect(reverse('passengers:view ticket', args={pk}))
-
-
-
-
-
-
-
-
-
-
-

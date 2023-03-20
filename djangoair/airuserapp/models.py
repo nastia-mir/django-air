@@ -22,6 +22,8 @@ class Ticket(models.Model):
     lunch = models.ForeignKey(LunchOptions, on_delete=models.CASCADE, related_name='lunch', null=True)
     luggage = models.ForeignKey(LuggageOptions, on_delete=models.CASCADE, related_name='luggage', null=True)
 
+    is_paid = models.BooleanField(default=False)
+
     checkin_options = (
         (StatusOptions.no_checkin.value, 'No check-in'),
         (StatusOptions.editing.value, 'Editing'),  # check-in requests not for all passengers from ticket
@@ -44,11 +46,32 @@ class Ticket(models.Model):
         return '{} tickets to {}'.format(self.tickets_quantity, self.flight)
 
 
-class CheckIn(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket')
+class PassengerFullName(models.Model):
     passenger_first_name = models.CharField(max_length=150, null=False, blank=False)
     passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
-    extra_luggage = models.IntegerField(default=0)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket')
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return '{} {}'.format(self.passenger_first_name, self.passenger_last_name)
+
+
+class ExtraLuggageTicket(models.Model):
+    amount = models.IntegerField(default=0)
+    passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='extra_luggage_ticket')
+    is_paid = models.BooleanField(default=False)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return '{}, {} extra luggage'.format(self.passenger, self.amount)
+
+
+class CheckIn(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket_checkin')
+    passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger_checkin')
+    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_checkin')
     status_choices = (
         (StatusOptions.in_progress.value, 'In progress'),
         (StatusOptions.completed.value, 'Completed')
@@ -58,14 +81,13 @@ class CheckIn(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return '{} {}, status: {}'.format(self.passenger_first_name, self.passenger_last_name, self.get_status_display())
+        return '{}, status: {}'.format(self.passenger, self.get_status_display())
 
 
 class BoardingPass(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='boarding_pass')
-    passenger_first_name = models.CharField(max_length=150, null=False, blank=False)
-    passenger_last_name = models.CharField(max_length=150, null=False, blank=False)
-    extra_luggage = models.IntegerField(default=0)
+    passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger')
+    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_boarding_pass')
     code = models.CharField(max_length=10, blank=False, null=False)
 
     status_choices = (
@@ -78,4 +100,26 @@ class BoardingPass(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return '{}, {} {}'.format(self.code, self.passenger_first_name, self.passenger_last_name)
+        return '{}, {} {}'.format(self.code, self.passenger)
+
+
+class TicketBill(models.Model):
+    ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE, related_name='ticket_bill')
+    total_price = models.IntegerField()
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return '{} paid on {}'.format(self.ticket, self.date_created)
+
+
+class ExtraLuggageBill(models.Model):
+    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_bill')
+    total_price = models.IntegerField()
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return '{} paid on {}'.format(self.extra_luggage, self.date_created)

@@ -7,9 +7,6 @@
 
         <h5 class="card-title">
             {{ticket.flight}}
-            {% if ticket.flight.is_canceled %}
-            Canceled.
-            {% endif %}
         </h5>
         </br>
 
@@ -35,6 +32,10 @@
         {% endif %}
     </div>
 </div>
+
+{% if not ticket.is_paid and not ticket.flight.is_canceled %}
+{% include 'payment.html' %}
+{% endif %}
 
 {% else %}
 <h2>You need to login to view you tickets details.</h2>

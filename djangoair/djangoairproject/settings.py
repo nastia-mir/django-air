@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'airstaffapp',
     'airuserapp',
     'bootstrap5',
+    'django_extensions'
+
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,14 @@ DATABASES = {
         'PASSWORD': env('POSTGRES_PASSWORD'),
         'HOST': env('POSTGRES_HOST'),
         'PORT': env('POSTGRES_PORT'),
-    }
+    },
+    # 'nonrel': {
+    #     'ENGINE': 'djongo',
+    #     'NAME': env('MONGO_NAME'),
+    # }
 }
+
+DATABASE_ROUTERS = ['airuserapp.utils.db_routers.NonRelRouter']
 
 # Password validation
 
@@ -133,3 +141,9 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 PASSWORD_RESET_TIMEOUT = 300
+
+
+# Stripe settings
+
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
