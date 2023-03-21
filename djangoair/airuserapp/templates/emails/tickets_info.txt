@@ -8,6 +8,6 @@ Luggage: {{ticket.luggage}}
 
 Total price: {{total_price}}$
 
-Please note, that you need to complete payment to proceed with your flight. PLease check your personal cabinet for details.
+Please note, that you need to complete payment to proceed with your flight. Check your personal cabinet for details.
 
 Thank you for choosing Django Air!
