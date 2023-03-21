@@ -112,6 +112,7 @@ class BoardingPass(models.Model):
 class TicketBill(models.Model):
     ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE, related_name='ticket_bill')
     total_price = models.IntegerField()
+    stripe_charge = models.CharField(max_length=27, null=False, blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
@@ -124,6 +125,7 @@ class ExtraLuggageBill(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket_luggage_bill', null=True)
     luggage_amount = models.IntegerField(default=0)
     total_price = models.IntegerField(default=0)
+    stripe_charge = models.CharField(max_length=27, null=False, blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()

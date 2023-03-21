@@ -160,10 +160,13 @@ class ViewTicketView(TemplateView):
 
 class ProcessTicketPaymentView(View):
     def post(self, request, pk, price):
-        customer = stripe.Customer.create(
-            email=request.user.email,
-            source=request.POST.get('stripeToken')
-        )
+        try:
+            customer = list(stripe.Customer.search(query='email:"{}"'.format(request.user.email)))[0]
+        except:
+            customer = stripe.Customer.create(
+                email=request.user.email,
+                source=request.POST.get('stripeToken')
+            )
 
         charge = stripe.Charge.create(
             customer=customer,
@@ -177,7 +180,8 @@ class ProcessTicketPaymentView(View):
 
         bill = TicketBill.objects.create(
             ticket=ticket,
-            total_price=price
+            total_price=price,
+            stripe_charge=charge.id
         )
         Emails.send_ticket_bill(request, bill, request.user.email)
         return redirect(reverse('passengers:view ticket', args={pk}))
@@ -268,11 +272,8 @@ class DeleteFromCheckin(DeleteView):
 
 class ProcessExtraLuggagePaymentView(View):
     def post(self, request, pk, price):
-        customer = stripe.Customer.create(
-            email=request.user.email,
-            source=request.POST.get('stripeToken')
-        )
-
+        find_customer = list(stripe.Customer.search(query='email:"{}"'.format(request.user.email)))[0]
+        customer = stripe.Customer.retrieve(id=find_customer.id)
         charge = stripe.Charge.create(
             customer=customer,
             amount=price * 100,
@@ -294,6 +295,7 @@ class ProcessExtraLuggagePaymentView(View):
             ticket=ticket,
             luggage_amount=amount,
             total_price=price,
+            stripe_charge=charge.id
         )
         Emails.send_extra_luggage_bill(request, bill, request.user.email)
         return redirect(reverse('passengers:view ticket', args={pk}))
