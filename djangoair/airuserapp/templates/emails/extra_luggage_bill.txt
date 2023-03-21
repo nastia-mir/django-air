@@ -1,11 +1,7 @@
-You had chosen extra luggage for some of your tickets:
+You had sucessfully paid for your extra luggage.
 
-{% for boarding_pass in extra_luggage_passes %}
-
-Passenger: {{boarding_pass.passenger_first_name}} {{boarding_pass.passenger_last_name}}
-Quantity: {{boarding_pass.extra_luggage}}
-Price: {{boarding_pass.ticket.flight.extra_luggage_price}}
-
-{% endfor %}
+Tickets: {{extra_luggage_bill.ticket}}
+Extra luggage amount: {{extra_luggage_bill.luggage_amount}}
+Price: {{extra_luggage_bill.total_price}}$
 
 Thank you for choosing Django Air!

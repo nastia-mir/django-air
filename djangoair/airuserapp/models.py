@@ -72,8 +72,10 @@ class ExtraLuggageTicket(models.Model):
 
 class CheckIn(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket_checkin')
-    passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger_checkin')
-    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_checkin')
+    passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger_checkin',
+                                     null=True, blank=True)
+    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_checkin',
+                                         null=True, blank=True)
     status_choices = (
         (StatusOptions.waiting_for_extra_payment.value, 'Waiting for extra payment'),
         (StatusOptions.in_progress.value, 'In progress'),
@@ -90,7 +92,8 @@ class CheckIn(models.Model):
 class BoardingPass(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='boarding_pass')
     passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger')
-    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_boarding_pass')
+    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_boarding_pass',
+                                         null=True, blank=True)
     code = models.CharField(max_length=10, blank=False, null=False)
 
     status_choices = (
@@ -118,11 +121,12 @@ class TicketBill(models.Model):
 
 
 class ExtraLuggageBill(models.Model):
-    extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_bill')
-    total_price = models.IntegerField()
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket_luggage_bill', null=True)
+    luggage_amount = models.IntegerField(default=0)
+    total_price = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
 
     def __str__(self):
-        return '{} paid on {}'.format(self.extra_luggage, self.date_created)
+        return '{} extra luggage paid on {}'.format(self.luggage_amount, self.date_created)

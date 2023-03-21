@@ -5,10 +5,11 @@
 <h3>You have already finished your check-in.</h3>
 {% else %}
 
-{% if form %}
+{% if full_name_form and extra_luggage_form %}
 <form method="POST">
     {% csrf_token %}
-    {{form.as_p}}
+    {{full_name_form.as_p}}
+    {{extra_luggage_form.as_p}}
     <label class="form-label">You need to add {{left}} more passengers.</label> </br>
     <input class="btn btn-outline-primary" type="submit" name="add_passenger" value="Add passenger"/>
 </form>
@@ -28,14 +29,20 @@
 
 </br>
 
-{% if passengers %}
+{% if checkins %}
 
 <ul class="list-group list-group-flush">
-    {% for passenger in passengers %}
+    {% for checkin in checkins %}
 
     <li class="list-group-item">
-        <p class="me-1">{{passenger}} </p>
-        <a href="{% url 'passengers:delete checkin' passenger.id %}" class="text-danger text-decoration-none">Delete</a>
+        <p class="me-1">
+            {% if checkin.extra_luggage %}
+            {{checkin.extra_luggage}}
+            {% else %}
+            {{checkin.passenger}}
+            {% endif %}
+        </p>
+        <a href="{% url 'passengers:delete checkin' checkin.id %}" class="text-danger text-decoration-none">Delete</a>
     </li>
 
     {% endfor %}

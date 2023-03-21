@@ -2,7 +2,7 @@ from django.forms import ModelForm, TextInput, Select, NumberInput
 
 from airstaffapp.models import Flight
 
-from airuserapp.models import CheckIn
+from airuserapp.models import PassengerFullName, ExtraLuggageTicket
 
 
 class TicketForm(ModelForm):
@@ -28,13 +28,22 @@ class TicketForm(ModelForm):
                 pass
 
 
-class CheckInForm(ModelForm):
+class PassengerFullNameForm(ModelForm):
     class Meta:
-        model = CheckIn
-        fields = ['extra_luggage']
+        model = PassengerFullName
+        fields = ['passenger_first_name', 'passenger_last_name']
 
         widgets = {
-
-            'extra_luggage': NumberInput(attrs={'class': 'form-control'})
+            'passenger_first_name': TextInput(attrs={'class': 'form-control'}),
+            'passenger_last_name': TextInput(attrs={'class': 'form-control'}),
         }
 
+
+class ExtraLuggageTicketForm(ModelForm):
+    class Meta:
+        model = ExtraLuggageTicket
+        fields = ['amount']
+
+        widgets = {
+            'amount': NumberInput(attrs={'class': 'form-control'})
+        }

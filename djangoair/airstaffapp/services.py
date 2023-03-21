@@ -10,8 +10,7 @@ class CreateBoardingPass:
             chars = 'ABCDEFGHIJKLMNOPQRSTUVXXYZ0123456789'
             code = get_random_string(10, chars)
             boarding_pass = BoardingPass.objects.create(ticket=checkin.ticket,
-                                                        passenger_first_name=checkin.passenger_first_name,
-                                                        passenger_last_name=checkin.passenger_last_name,
+                                                        passenger=checkin.passenger,
                                                         code=code,
                                                         extra_luggage=checkin.extra_luggage)
             boarding_pass.save()

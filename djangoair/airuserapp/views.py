@@ -5,8 +5,8 @@ from django.views.generic.edit import ProcessFormView, View
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
-from airuserapp.forms import TicketForm, CheckInForm
-from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill
+from airuserapp.forms import TicketForm, PassengerFullNameForm, ExtraLuggageTicketForm
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill, PassengerFullName, ExtraLuggageTicket
 from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -146,19 +146,19 @@ class ViewTicketView(TemplateView):
         context['ticket'] = ticket
         if not ticket.is_paid:
             price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
-        elif ticket.check_in == StatusOptions.waiting_for_extra_payment:
+        elif ticket.check_in == StatusOptions.waiting_for_extra_payment.value:
             price = 0
             extra_luggage_price = ticket.flight.extra_luggage_price
             for checkin in list(CheckIn.objects.filter(ticket=ticket)):
-                if checkin.extra_luggage.amount != 0:
+                if checkin.extra_luggage:
                     price += checkin.extra_luggage.amount * extra_luggage_price
-        else: price = None
+        else:
+            price = None
         context['price'] = price
         return context
 
 
 class ProcessTicketPaymentView(View):
-
     def post(self, request, pk, price):
         customer = stripe.Customer.create(
             email=request.user.email,
@@ -193,19 +193,23 @@ class CheckInView(ProcessFormView):
             context['ticket'] = ticket
             checkins = list(CheckIn.objects.filter(ticket=ticket))
             if checkins:
-                context['passengers'] = checkins
+                context['checkins'] = checkins
                 if len(checkins) < ticket.tickets_quantity:
-                    context['form'] = CheckInForm
+                    context['full_name_form'] = PassengerFullNameForm
+                    context['extra_luggage_form'] = ExtraLuggageTicketForm
                     context['left'] = ticket.tickets_quantity - len(checkins)
                 elif len(checkins) == ticket.tickets_quantity:
-                    context['form'] = None
+                    context['full_name_form'] = None
+                    context['extra_luggage_form'] = None
                     context['left'] = 0
                 else:
-                    context['form'] = None
+                    context['full_name_form'] = None
+                    context['extra_luggage_form'] = None
                     context['left'] = -1
             else:
-                context['passengers'] = None
-                context['form'] = CheckInForm
+                context['checkins'] = None
+                context['full_name_form'] = PassengerFullNameForm
+                context['extra_luggage_form'] = ExtraLuggageTicketForm
                 context['left'] = ticket.tickets_quantity
 
             return render(request, 'passenger_checkin.html', context)
@@ -213,11 +217,28 @@ class CheckInView(ProcessFormView):
     def post(self, request, pk):
         ticket = Ticket.objects.get(id=pk)
         if 'add_passenger' in request.POST:
-            form = CheckInForm(request.POST)
-            if form.is_valid():
-                checkin_form = form.save(commit=False)
-                checkin_form.ticket = ticket
-                checkin_form.save()
+            full_name_form = PassengerFullNameForm(request.POST)
+            extra_luggage_form = ExtraLuggageTicketForm(request.POST)
+            if full_name_form.is_valid() and extra_luggage_form.is_valid():
+                passenger_full_name = full_name_form.save(commit=False)
+                passenger_full_name.ticket = ticket
+                passenger_full_name.save()
+                extra_luggage = extra_luggage_form.save(commit=False)
+                if extra_luggage.amount != 0:
+                    extra_luggage.passenger = passenger_full_name
+                    extra_luggage.save()
+                    checkin = CheckIn.objects.create(
+                        ticket=ticket,
+                        passenger=passenger_full_name,
+                        extra_luggage=extra_luggage,
+                        status=StatusOptions.waiting_for_extra_payment.value
+                    )
+                else:
+                    checkin = CheckIn.objects.create(
+                        ticket=ticket,
+                        passenger=passenger_full_name,
+                    )
+
                 if ticket.check_in != StatusOptions.editing.value:
                     ticket.check_in = StatusOptions.editing.value
                     ticket.save()
@@ -226,9 +247,13 @@ class CheckInView(ProcessFormView):
             return redirect(reverse('passengers:checkin', args={pk}))
         elif 'checkin' in request.POST:
             ticket.check_in = StatusOptions.waiting_for_approval.value
+            extra_luggage_checkins = []
             for checkin in list(CheckIn.objects.filter(ticket=ticket)):
-                if checkin.extra_luggage.amount != 0:
+                if checkin.extra_luggage:
                     ticket.check_in = StatusOptions.waiting_for_extra_payment.value
+                    extra_luggage_checkins.append(checkin)
+            if ticket.check_in == StatusOptions.waiting_for_extra_payment.value:
+                Emails.send_extra_luggage_info(request, extra_luggage_checkins, request.user.email)
             ticket.save()
             return redirect(reverse('passengers:view ticket', args={pk}))
 
@@ -236,12 +261,12 @@ class CheckInView(ProcessFormView):
 class DeleteFromCheckin(DeleteView):
     def get(self, request, pk):
         checkin = CheckIn.objects.get(id=self.kwargs['pk'])
+        checkin.passenger.delete()
         checkin.delete()
         return redirect(reverse('passengers:checkin', args={checkin.ticket.id}))
 
 
 class ProcessExtraLuggagePaymentView(View):
-
     def post(self, request, pk, price):
         customer = stripe.Customer.create(
             email=request.user.email,
@@ -255,9 +280,22 @@ class ProcessExtraLuggagePaymentView(View):
             description='Django Air extra luggage payment',
         )
         ticket = Ticket.objects.get(id=pk)
-        ticket.is_paid = True
+        checkins = list(CheckIn.objects.filter(ticket=ticket, status=StatusOptions.waiting_for_extra_payment.value))
+        amount = 0
+        for checkin in checkins:
+            checkin.status = StatusOptions.in_progress.value
+            checkin.extra_luggage.is_paid = True
+            checkin.extra_luggage.save()
+            amount += checkin.extra_luggage.amount
+            checkin.save()
+        ticket.check_in = StatusOptions.waiting_for_approval.value
         ticket.save()
-
+        bill = ExtraLuggageBill.objects.create(
+            ticket=ticket,
+            luggage_amount=amount,
+            total_price=price,
+        )
+        Emails.send_extra_luggage_bill(request, bill, request.user.email)
         return redirect(reverse('passengers:view ticket', args={pk}))
 
 

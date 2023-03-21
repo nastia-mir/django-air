@@ -30,6 +30,7 @@
 
         {% elif ticket.check_in == 'waiting_for_extra_payment' %}
         <br/>
+        <p><b>Extra luggage price:</b> {{price}}$</p>
         <p>You have to complete extra luggage payment to proceed.</p>
         {% include 'extra_luggage_payment.html' %}
 

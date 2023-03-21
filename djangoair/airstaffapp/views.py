@@ -296,13 +296,6 @@ class CheckInView(UserPassesTestMixin, ProcessFormView):
             boarding_passes_list = list(BoardingPass.objects.filter(ticket=checkin.ticket).all())
             email = checkin.ticket.passenger.user.email
             Emails.send_boarding_pass(request, boarding_passes_list, email)
-
-            extra_luggage_passes = []
-            for boarding_pass in boarding_passes_list:
-                if boarding_pass.extra_luggage != 0:
-                    extra_luggage_passes.append(boarding_pass)
-            if len(extra_luggage_passes) != 0:
-                Emails.send_extra_luggage_bill(request, extra_luggage_passes, email)
         return redirect('staff:checkin list')
 
 

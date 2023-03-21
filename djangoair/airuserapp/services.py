@@ -67,18 +67,18 @@ class Emails:
             messages.error(request, "Boarding passes are  not sent.")
 
     @classmethod
-    def send_extra_luggage_bill(cls, request, extra_luggage_passes, email):
+    def send_extra_luggage_info(cls, request, extra_luggage_checkins, email):
         context = {
-            'extra_luggage_passes': extra_luggage_passes
+            'extra_luggage_checkins': extra_luggage_checkins
         }
 
-        subject = 'Django Air: Extra luggage bill'
-        message = render_to_string("emails/extra_luggage_bill.txt", context)
+        subject = 'Django Air: Extra luggage info'
+        message = render_to_string("emails/extra_luggage_info.txt", context)
         email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
-            messages.success(request, 'Extra luggage bills is sent.')
+            messages.success(request, 'Extra luggage info is sent.')
         else:
-            messages.error(request, "Extra luggage bill is not sent.")
+            messages.error(request, "Extra luggage info is not sent.")
 
     @classmethod
     def seng_gate_register_confirmation(cls, request, email):
@@ -112,6 +112,18 @@ class Emails:
 
         subject = 'Django Air: Ticket bill'
         message = render_to_string("emails/ticket_bill.txt", context)
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
+        if email:
+            messages.success(request, 'You will receive your bill via email')
+        else:
+            messages.error(request, "We couldn't send you an email.")
+
+    @classmethod
+    def send_extra_luggage_bill(cls, request, extra_luggage_bill, email):
+        context = {'extra_luggage_bill': extra_luggage_bill}
+
+        subject = 'Django Air: Extra luggage bill'
+        message = render_to_string("emails/extra_luggage_bill.txt", context)
         email = send_mail(subject, message, EMAIL_HOST_USER, [email])
         if email:
             messages.success(request, 'You will receive your bill via email')
