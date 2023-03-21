@@ -105,3 +105,15 @@ class Emails:
             messages.success(request, 'We send you a link to change password via email.')
         else:
             messages.error(request, "We couldn't send you an email, please check if you typed it correctly.")
+
+    @classmethod
+    def send_ticket_bill(cls, request, ticket_bill, email):
+        context = {'ticket_bill': ticket_bill}
+
+        subject = 'Django Air: Ticket bill'
+        message = render_to_string("emails/ticket_bill.txt", context)
+        email = send_mail(subject, message, EMAIL_HOST_USER, [email])
+        if email:
+            messages.success(request, 'You will receive your bill via email')
+        else:
+            messages.error(request, "We couldn't send you an email.")

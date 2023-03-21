@@ -10,7 +10,8 @@ urlpatterns = [
     path('tickets/<pk>/details/', views.TicketDetailsView.as_view(), name='ticket details'),
     path('tickets/<pk>/booking/', views.TicketBookingView.as_view(), name='ticket booking'),
 
-    path('payment/<pk>/<int:price>/', views.ProcessPaymentView.as_view(), name='payment'),
+    path('payment/<pk>/<int:price>/', views.ProcessTicketPaymentView.as_view(), name='ticket payment'),
+    path('payment/<pk>/<int:price>/', views.ProcessExtraLuggagePaymentView.as_view(), name='extra luggage payment'),
 
     path('ajax/load_dates/', views.load_dates, name='ajax load dates'),
 

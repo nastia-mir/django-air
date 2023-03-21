@@ -2,7 +2,7 @@
 {% block content %}
 
 {% if request.user.is_authenticated %}
-<div class="card" style="width: 28rem;">
+<div class="card" style="width: 32rem;">
     <div class="card-body">
 
         <h5 class="card-title">
@@ -16,10 +16,22 @@
         <p><b>Luggage:</b> {{ticket.luggage}}</p>
 
         <br/>
+        {% if not ticket.flight.is_canceled %}
+
+        {% if not ticket.is_paid %}
+        <p><b>Total:</b> {{price}}$</p>
+        <p>You have to complete the payment to proceed.</p>
+        {% include 'ticket_payment.html' %}
+        {% else %}
+
         <p><b>Check-in status:</b> {{ticket.get_check_in_display}}</p>
         {% if ticket.check_in == 'no_checkin' or ticket.check_in == 'editing' %}
         <a href="{% url 'passengers:checkin' ticket.id %}" class="btn btn-outline-primary">Check-in</a>
 
+        {% elif ticket.check_in == 'waiting_for_extra_payment' %}
+        <br/>
+        <p>You have to complete extra luggage payment to proceed.</p>
+        {% include 'extra_luggage_payment.html' %}
 
         {% elif ticket.check_in == 'completed' %}
 
@@ -30,11 +42,11 @@
         {% endif %}
 
         {% endif %}
+        {% endif %}
     </div>
 </div>
 
-{% if not ticket.is_paid and not ticket.flight.is_canceled %}
-{% include 'payment.html' %}
+
 {% endif %}
 
 {% else %}

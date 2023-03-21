@@ -1,0 +1,62 @@
+<div class="card" >
+    <div class="card-body">
+        <form action="{% url 'passengers:extra luggage payment' ticket.id price %}" id="payment-form" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <label for="card-element">
+                    Credit or debit card
+                </label>
+                </br> </br>
+                <div id="card-element">
+
+                </div>
+
+                <div id="card-errors" role="alert"></div>
+            </div>
+            </br>
+            <button class="btn btn-success">Submit Payment</button>
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+    const stripe = Stripe('pk_test_51Mmc53HzRZa8IXlSqIyY0p9cZweaOstzwcT0ZG9elUP8rTn1reE1uZWSv7HF73KXCSG44lRyQU2x3H5C3vhGnyHK00j2MBEksP');
+    const elements = stripe.elements();
+
+    const style = {
+      base: {
+        fontSize: '16px',
+        color: '#32325d',
+      },
+    };
+
+    const card = elements.create('card', {style});
+    card.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const {token, error} = await stripe.createToken(card);
+
+      if (error) {
+        const errorElement = document.getElementById('card-errors');
+        errorElement.textContent = error.message;
+      } else {
+        stripeTokenHandler(token);
+      }
+    });
+
+    const stripeTokenHandler = (token) => {
+      const form = document.getElementById('payment-form');
+      const hiddenInput = document.createElement('input');
+      hiddenInput.setAttribute('type', 'hidden');
+      hiddenInput.setAttribute('name', 'stripeToken');
+      hiddenInput.setAttribute('value', token.id);
+      form.appendChild(hiddenInput);
+
+      form.submit();
+    }
+</script>

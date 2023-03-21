@@ -1,4 +1,3 @@
-import json
 import stripe
 
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
@@ -7,7 +6,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm, CheckInForm
-from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill
 from airuserapp.services import Emails
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -145,12 +144,20 @@ class ViewTicketView(TemplateView):
         context = super(ViewTicketView, self).get_context_data()
         ticket = Ticket.objects.get(id=self.kwargs['pk'])
         context['ticket'] = ticket
-        total_price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
-        context['total_price'] = total_price
+        if not ticket.is_paid:
+            price = (ticket.flight.ticket_price + ticket.lunch.price + ticket.luggage.price) * ticket.tickets_quantity
+        elif ticket.check_in == StatusOptions.waiting_for_extra_payment:
+            price = 0
+            extra_luggage_price = ticket.flight.extra_luggage_price
+            for checkin in list(CheckIn.objects.filter(ticket=ticket)):
+                if checkin.extra_luggage.amount != 0:
+                    price += checkin.extra_luggage.amount * extra_luggage_price
+        else: price = None
+        context['price'] = price
         return context
 
 
-class ProcessPaymentView(View):
+class ProcessTicketPaymentView(View):
 
     def post(self, request, pk, price):
         customer = stripe.Customer.create(
@@ -162,11 +169,17 @@ class ProcessPaymentView(View):
             customer=customer,
             amount=price * 100,
             currency='usd',
-            description='Ticket payment',
+            description='Django Air ticket payment',
         )
         ticket = Ticket.objects.get(id=pk)
         ticket.is_paid = True
+        ticket.save()
 
+        bill = TicketBill.objects.create(
+            ticket=ticket,
+            total_price=price
+        )
+        Emails.send_ticket_bill(request, bill, request.user.email)
         return redirect(reverse('passengers:view ticket', args={pk}))
 
 
@@ -213,6 +226,9 @@ class CheckInView(ProcessFormView):
             return redirect(reverse('passengers:checkin', args={pk}))
         elif 'checkin' in request.POST:
             ticket.check_in = StatusOptions.waiting_for_approval.value
+            for checkin in list(CheckIn.objects.filter(ticket=ticket)):
+                if checkin.extra_luggage.amount != 0:
+                    ticket.check_in = StatusOptions.waiting_for_extra_payment.value
             ticket.save()
             return redirect(reverse('passengers:view ticket', args={pk}))
 
@@ -222,6 +238,27 @@ class DeleteFromCheckin(DeleteView):
         checkin = CheckIn.objects.get(id=self.kwargs['pk'])
         checkin.delete()
         return redirect(reverse('passengers:checkin', args={checkin.ticket.id}))
+
+
+class ProcessExtraLuggagePaymentView(View):
+
+    def post(self, request, pk, price):
+        customer = stripe.Customer.create(
+            email=request.user.email,
+            source=request.POST.get('stripeToken')
+        )
+
+        charge = stripe.Charge.create(
+            customer=customer,
+            amount=price * 100,
+            currency='usd',
+            description='Django Air extra luggage payment',
+        )
+        ticket = Ticket.objects.get(id=pk)
+        ticket.is_paid = True
+        ticket.save()
+
+        return redirect(reverse('passengers:view ticket', args={pk}))
 
 
 class GateRegisterView(ProcessFormView):

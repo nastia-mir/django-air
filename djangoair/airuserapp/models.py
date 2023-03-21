@@ -9,6 +9,7 @@ from accounts.models import Passenger
 class StatusOptions(Enum):
     no_checkin = 'no_checkin'
     editing = 'editing'
+    waiting_for_extra_payment = 'waiting_for_extra_payment'
     waiting_for_approval = 'waiting_for_approval'
     completed = 'completed'
     not_registered = 'not_registered'
@@ -27,6 +28,7 @@ class Ticket(models.Model):
     checkin_options = (
         (StatusOptions.no_checkin.value, 'No check-in'),
         (StatusOptions.editing.value, 'Editing'),  # check-in requests not for all passengers from ticket
+        (StatusOptions.waiting_for_extra_payment.value, 'Waiting for extra payment'),
         (StatusOptions.waiting_for_approval.value, 'Waiting for approval'),
         (StatusOptions.completed.value, 'Completed')
     )
@@ -73,6 +75,7 @@ class CheckIn(models.Model):
     passenger = models.OneToOneField(PassengerFullName, on_delete=models.CASCADE, related_name='passenger_checkin')
     extra_luggage = models.OneToOneField(ExtraLuggageTicket, on_delete=models.CASCADE, related_name='extra_luggage_checkin')
     status_choices = (
+        (StatusOptions.waiting_for_extra_payment.value, 'Waiting for extra payment'),
         (StatusOptions.in_progress.value, 'In progress'),
         (StatusOptions.completed.value, 'Completed')
     )
