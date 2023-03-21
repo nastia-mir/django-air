@@ -8,9 +8,8 @@
         <h6 class="card-subtitle mb-2 text-muted"><b>Ticket owner:</b> {{checkin.ticket.passenger}}</h6>
 
         <br/>
-        <p><b>Passenger first name:</b> {{checkin.passenger_first_name}}</p>
-        <p><b>Passenger last name:</b> {{checkin.passenger_last_name}}</p>
-        <p><b>Extra luggage:</b> {{checkin.extra_luggage}} ({{extra_luggage_price}}$)</p>
+        <p><b>Passenger full name:</b> {{checkin.passenger}}</p>
+        <p><b>Extra luggage:</b> {{extra_luggage}}</p>
         <p><b>Status:</b> {{checkin.get_status_display}}</p>
 
         <form method="POST">

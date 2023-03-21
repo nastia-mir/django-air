@@ -279,8 +279,11 @@ class CheckInView(UserPassesTestMixin, ProcessFormView):
 
     def get(self, request, pk):
         checkin = CheckIn.objects.get(id=pk)
-        context = {'checkin': checkin,
-                   'extra_luggage_price': checkin.ticket.flight.extra_luggage_price * checkin.extra_luggage}
+        context = {'checkin': checkin}
+        if checkin.extra_luggage:
+            context['extra_luggage'] = checkin.extra_luggage.amount
+        else:
+            context['extra_luggage'] = 0
         return render(request, 'checkin.html', context)
 
     def post(self, request, pk):
