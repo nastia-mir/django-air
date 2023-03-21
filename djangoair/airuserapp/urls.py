@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('payment/<pk>/ticket/<int:price>/', views.ProcessTicketPaymentView.as_view(), name='ticket payment'),
     path('payment/<pk>/luggage/<int:price>/', views.ProcessExtraLuggagePaymentView.as_view(), name='extra luggage payment'),
+    path('refund/<pk>/', views.RefundView.as_view(), name='refund'),
 
     path('ajax/load_dates/', views.load_dates, name='ajax load dates'),
 

@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from airuserapp.forms import TicketForm, PassengerFullNameForm, ExtraLuggageTicketForm
 from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill, PassengerFullName, ExtraLuggageTicket
-from airuserapp.services import Emails
+from airuserapp.services import Emails, Charges
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
 
@@ -313,5 +313,19 @@ class GateRegisterView(ProcessFormView):
             boarding_pass.status = StatusOptions.in_progress.value
             boarding_pass.save()
         ticket.gate_registration = StatusOptions.waiting_for_approval.value
+        ticket.save()
+        return redirect(reverse('passengers:view ticket', args={pk}))
+
+
+class RefundView(View):
+    def post(self, request, pk):
+        ticket = Ticket.objects.get(id=pk)
+        charges = Charges.get_all_related_charges(ticket)
+
+        ticket_refund = stripe.Refund.create(charge=charges['ticket']['stripe_charge'])
+        if charges['extra_luggage']:
+            luggage_refund = stripe.Refund.create(charge=charges['extra_luggage']['stripe_charge'])
+
+        ticket.is_refunded = True
         ticket.save()
         return redirect(reverse('passengers:view ticket', args={pk}))

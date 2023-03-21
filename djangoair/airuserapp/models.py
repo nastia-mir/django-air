@@ -24,6 +24,7 @@ class Ticket(models.Model):
     luggage = models.ForeignKey(LuggageOptions, on_delete=models.CASCADE, related_name='luggage', null=True)
 
     is_paid = models.BooleanField(default=False)
+    is_refunded = models.BooleanField(default=False)
 
     checkin_options = (
         (StatusOptions.no_checkin.value, 'No check-in'),

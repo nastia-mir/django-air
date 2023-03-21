@@ -6,6 +6,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 
+from airuserapp.models import TicketBill, ExtraLuggageBill
+
 from djangoairproject.settings import EMAIL_HOST_USER
 
 from accounts.tokens import account_activation_token
@@ -129,3 +131,29 @@ class Emails:
             messages.success(request, 'You will receive your bill via email')
         else:
             messages.error(request, "We couldn't send you an email.")
+
+
+class Charges:
+    @classmethod
+    def get_all_related_charges(cls, ticket):
+        ticket_bill = TicketBill.objects.get(ticket=ticket)
+        try:
+            extra_luggage_bill = ExtraLuggageBill.objects.get(ticket=ticket)
+            charges = dict()
+            charges['ticket'] = {
+                'stripe_charge': ticket_bill.stripe_charge,
+                'total_price': ticket_bill.total_price
+                }
+            charges['extra_luggage'] = {
+                'stripe_charge': extra_luggage_bill.stripe_charge,
+                'total_price': extra_luggage_bill.total_price
+                }
+        except:
+            charges = {
+                'ticket': {
+                    'stripe_charge': ticket_bill.stripe_charge,
+                    'total_price': ticket_bill.total_price
+                },
+                'extra_luggage': None
+            }
+        return charges
