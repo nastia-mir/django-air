@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm, PassengerFullNameForm, ExtraLuggageTicketForm
-from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill, PassengerFullName, ExtraLuggageTicket
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill
 from airuserapp.services import Emails, Charges
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -272,8 +272,13 @@ class DeleteFromCheckin(DeleteView):
 
 class ProcessExtraLuggagePaymentView(View):
     def post(self, request, pk, price):
-        find_customer = list(stripe.Customer.search(query='email:"{}"'.format(request.user.email)))[0]
-        customer = stripe.Customer.retrieve(id=find_customer.id)
+        try:
+            customer = list(stripe.Customer.search(query='email:"{}"'.format(request.user.email)))[0]
+        except:
+            customer = stripe.Customer.create(
+                email=request.user.email,
+                source=request.POST.get('stripeToken')
+            )
         charge = stripe.Charge.create(
             customer=customer,
             amount=price * 100,

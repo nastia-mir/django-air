@@ -40,3 +40,15 @@ class TestUrls(SimpleTestCase):
     def test_gate_register(self):
         url = reverse('passengers:gate register', args={1})
         self.assertEqual(resolve(url).func.__name__, views.GateRegisterView.as_view().__name__)
+
+    def test_ticket_payment(self):
+        url = reverse('passengers:ticket payment', args={1, 10})
+        self.assertEqual(resolve(url).func.__name__, views.ProcessTicketPaymentView.as_view().__name__)
+
+    def test_extra_luggage_payment(self):
+        url = reverse('passengers:extra luggage payment', args={1, 10})
+        self.assertEqual(resolve(url).func.__name__, views.ProcessExtraLuggagePaymentView.as_view().__name__)
+
+    def test_refund(self):
+        url = reverse('passengers:refund', args={1})
+        self.assertEqual(resolve(url).func.__name__, views.RefundView.as_view().__name__)
