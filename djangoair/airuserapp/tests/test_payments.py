@@ -9,7 +9,7 @@ from accounts.models import MyUser, Passenger
 
 from airstaffapp.models import FlightDate, Flight, LunchOptions, LuggageOptions
 
-from airuserapp.models import Ticket, CheckIn, PassengerFullName, ExtraLuggageTicket
+from airuserapp.models import Ticket, CheckIn, PassengerFullName, ExtraLuggageTicket, TicketBill
 
 from djangoairproject import settings
 
@@ -47,7 +47,9 @@ class TestStripePayments(TestCase):
         self.ticket = Ticket.objects.create(
             passenger=self.passenger_account,
             flight=self.flight,
-            tickets_quantity=1
+            tickets_quantity=1,
+            lunch=self.lunch,
+            luggage=self.luggage
         )
         self.passenger_full_name = PassengerFullName.objects.create(
             passenger_first_name='John',
@@ -65,35 +67,44 @@ class TestStripePayments(TestCase):
         )
         self.ticket_payment_url = reverse('passengers:ticket payment', args={self.ticket.id, 30})
         self.extra_luggage_payment_url = reverse('passengers:extra luggage payment', args={self.ticket.id, 50})
-        self.refund_url = reverse('passengers:refund', args={self.ticket.id})
+
         stripe.api_key = settings.STRIPE_SECRET_KEY
+        self.customer = stripe.Customer.create(
+            email=self.user.email,
+            source='tok_visa'
+        )
+        self.ticket_for_bill = Ticket.objects.create(
+            passenger=self.passenger_account,
+            flight=self.flight,
+            tickets_quantity=1,
+            lunch=self.lunch,
+            luggage=self.luggage
+        )
+        self.ticket_charge = stripe.Charge.create(
+            customer=self.customer,
+            amount=3000,
+            currency='usd',
+            description='Django Air ticket payment',
+        )
+        self.ticket_bill = TicketBill.objects.create(
+            ticket=self.ticket_for_bill,
+            total_price=30,
+            stripe_charge=self.ticket_charge.id
+        )
+        self.refund_url = reverse('passengers:refund', args={self.ticket_for_bill.id})
         return super().setUp()
 
-    @patch('stripe.Customer.create')
-    @patch('stripe.Customer.search')
-    @patch('stripe.Charge.create')
-    @patch('airuserapp.models.TicketBill.objects.create')
-    def test_ProcessTicketPaymentView_POST(self, mock_bill_creation, mock_charge_create, mock_customer_search,
-                                           mock_customer_create):
+    def test_ProcessTicketPaymentView_POST(self):
         response = self.client.post(self.ticket_payment_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket.id}))
 
-    @patch('stripe.Customer.search')
-    @patch('stripe.Charge.create')
-    @patch('airuserapp.models.Ticket.objects.get')
-    @patch('airuserapp.models.CheckIn.objects.filter')
-    @patch('airuserapp.models.ExtraLuggageBill.objects.create')
-    def test_ProcessExtraLuggagePaymentView_POST(self, mock_bill_creation, mock_checkin_filter, mock_ticket_get,
-                                                 mock_charge_create, mock_customer_search):
+    def test_ProcessExtraLuggagePaymentView_POST(self):
         response = self.client.post(self.extra_luggage_payment_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket.id}))
 
-    @patch('stripe.Refund.create')
-    @patch('airuserapp.services.Charges.get_all_related_charges')
-    @patch('airuserapp.models.Ticket.objects.get')
-    def test_RefundView_POST(self, mock_ticket_get, mock_get_related_charges, mock_refund_create):
+    def test_RefundView_POST(self):
         response = self.client.post(self.refund_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket.id}))
+        self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket_for_bill.id}))
