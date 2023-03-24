@@ -133,3 +133,15 @@ class ExtraLuggageBill(models.Model):
 
     def __str__(self):
         return '{} extra luggage paid on {}'.format(self.luggage_amount, self.date_created)
+
+
+class RefundBill(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='ticket_refund_bill')
+    stripe_refund_ticket = models.CharField(max_length=27, null=False, blank=False)
+    stripe_refund_luggage = models.CharField(max_length=27, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return 'Ticket {} refunded on {}.'.format(self.ticket, self.date_created)

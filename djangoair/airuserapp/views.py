@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from airuserapp.forms import TicketForm, PassengerFullNameForm, ExtraLuggageTicketForm
-from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill
+from airuserapp.models import Ticket, CheckIn, BoardingPass, StatusOptions, TicketBill, ExtraLuggageBill, RefundBill
 from airuserapp.services import Emails, Charges
 
 from airstaffapp.models import Flight, FlightDate, LunchOptions, LuggageOptions
@@ -328,8 +328,14 @@ class RefundView(View):
         charges = Charges.get_all_related_charges(ticket)
 
         ticket_refund = stripe.Refund.create(charge=charges['ticket']['stripe_charge'])
+        refund_bill = RefundBill.objects.create(
+            ticket=ticket,
+            stripe_refund_ticket=ticket_refund.id
+        )
         if charges['extra_luggage']:
             luggage_refund = stripe.Refund.create(charge=charges['extra_luggage']['stripe_charge'])
+            refund_bill.stripe_refund_luggage = luggage_refund.id
+            refund_bill.save()
 
         ticket.is_refunded = True
         ticket.save()
