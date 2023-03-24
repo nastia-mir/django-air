@@ -1,15 +1,15 @@
 import stripe
 
-from mock import patch
-
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.core import mail
 
 from accounts.models import MyUser, Passenger
 
 from airstaffapp.models import FlightDate, Flight, LunchOptions, LuggageOptions
 
-from airuserapp.models import Ticket, CheckIn, PassengerFullName, ExtraLuggageTicket, TicketBill
+from airuserapp.models import Ticket, CheckIn, PassengerFullName, ExtraLuggageTicket, TicketBill, ExtraLuggageBill, \
+    StatusOptions, RefundBill
 
 from djangoairproject import settings
 
@@ -96,15 +96,30 @@ class TestStripePayments(TestCase):
 
     def test_ProcessTicketPaymentView_POST(self):
         response = self.client.post(self.ticket_payment_url)
+        self.ticket = Ticket.objects.get(id=self.ticket.id)
+        self.assertTrue(self.ticket.is_paid)
+        self.assertTrue(TicketBill.objects.filter(ticket=self.ticket).exists())
+        self.assertTrue(stripe.Charge.retrieve(TicketBill.objects.get(ticket=self.ticket).stripe_charge))
+        self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket.id}))
 
     def test_ProcessExtraLuggagePaymentView_POST(self):
         response = self.client.post(self.extra_luggage_payment_url)
+        self.ticket = Ticket.objects.get(id=self.ticket.id)
+        self.checkin = CheckIn.objects.get(id=self.checkin.id)
+        self.assertEqual(self.checkin.status, StatusOptions.in_progress.value)
+        self.assertEqual(self.ticket.check_in, StatusOptions.waiting_for_approval.value)
+        self.assertTrue(ExtraLuggageBill.objects.filter(ticket=self.ticket).exists())
+        self.assertTrue(stripe.Charge.retrieve(ExtraLuggageBill.objects.get(ticket=self.ticket).stripe_charge))
+        self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket.id}))
 
     def test_RefundView_POST(self):
         response = self.client.post(self.refund_url)
+        self.ticket_for_bill = Ticket.objects.get(id=self.ticket_for_bill.id)
+        self.assertTrue(self.ticket_for_bill.is_refunded)
+        self.assertTrue(RefundBill.objects.filter(ticket=self.ticket_for_bill).exists())
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('passengers:view ticket', args={self.ticket_for_bill.id}))
