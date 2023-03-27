@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<ul class="list-group list-group-flush">
+    {% for checkin in object_list  %}
+
+    <li class="list-group-item">
+        <a href="{% url 'staff:checkin' checkin.id %}" class="text-decoration-none text-body">{{checkin}}</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

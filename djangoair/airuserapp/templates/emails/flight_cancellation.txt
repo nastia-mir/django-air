@@ -1,0 +1,7 @@
+Dear passenger,
+
+We are regret to inform you that you flight {{flight}} was canceled.
+
+Please check your personal cabinet for refund information.
+
+Thank you for choosing Django Air!

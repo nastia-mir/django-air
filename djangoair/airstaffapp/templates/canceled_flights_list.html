@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h5>Cancelled flights:</h5>
+
+<ul class="list-group list-group-flush">
+    {% for flight in object_list %}
+
+    <li class="list-group-item">
+        <a href="{% url 'staff:flight details' flight.id %}" class="text-decoration-none text-body">{{flight}}</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

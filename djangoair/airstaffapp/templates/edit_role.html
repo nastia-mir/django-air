@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if is_supervisor %}
+
+<h5>{{person.user.first_name}} {{person.user.last_name}}</h5>
+</br>
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input class="btn btn-outline-primary" type="submit" value="Submit"/>
+</form>
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
+
+{% endblock %}

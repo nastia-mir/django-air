@@ -1,0 +1,43 @@
+{% extends  "main.html" %}
+{% block content %}
+
+<br/>
+<a href="{% url 'passengers:tickets' %}" class="btn btn-outline-primary">Book tickets</a>
+<br/><br/>
+
+
+{% if request.user.is_authenticated %}
+
+{% if tickets|length != 0 %}
+<ul class="list-group list-group-flush">
+    {% for ticket in tickets %}
+
+    <li class="list-group-item">
+        <a href="{% url 'passengers:view ticket' ticket.id %}" class="text-decoration-none text-body">{{ticket}}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% else %}
+<p>You don't have any tickets yet.</p>
+{% endif %}
+
+<br/>
+
+<a href="{% url 'accounts:edit profile' %}" class="btn btn-outline-secondary">Edit profile</a>
+
+{% else %}
+
+<p>
+    Already have account?
+    <a href="{% url 'accounts:login' %}">Login</a>
+    to view detail information on your flight in personal cabinet.
+</p>
+
+<p>
+    Forgot password? <a href="{% url 'accounts:restore password' %}">Restore</a>
+</p>
+
+{% endif %}
+
+{% endblock %}

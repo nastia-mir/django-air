@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
+
+        <h5 class="card-title">{{boarding_pass.code}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted"><b>Ticket:</b> {{boarding_pass.ticket}}</h6>
+
+        </br>
+        <p><b>Passenger:</b> {{boarding_pass.passenger}}</p>
+        <p><b>Status:</b> {{boarding_pass.get_status_display}}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Approve"/>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

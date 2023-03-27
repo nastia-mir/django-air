@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input class="btn btn-primary" type="submit" value="Create"/>
+</form>
+
+</br>
+<ul class="list-group list-group-flush">
+    {% for lunch in options %}
+
+    <li class="list-group-item">
+        {{lunch}}
+        <a href="{% url 'staff:delete lunch' lunch.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

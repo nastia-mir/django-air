@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if is_supervisor %}
+
+<ul class="list-group list-group-flush">
+    {% for person in staff %}
+
+        <li class="list-group-item">
+            <p>{{person.user.first_name}} {{person.user.last_name}}, role: {{person.get_role_display }}
+                <a href="{% url 'staff:edit role' person.id %}"
+                   class="text-decoration-none badge bg-secondary text-wrap">Edit role.</a>
+            </p>
+        </li>
+
+    {% endfor %}
+</ul>
+
+{% else %}
+<h2>Only supervisors can access this page.</h2>
+{% endif %}
+
+{% endblock %}

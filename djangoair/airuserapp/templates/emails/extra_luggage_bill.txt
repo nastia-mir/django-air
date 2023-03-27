@@ -1,0 +1,7 @@
+You had sucessfully paid for your extra luggage.
+
+Tickets: {{extra_luggage_bill.ticket}}
+Extra luggage amount: {{extra_luggage_bill.luggage_amount}}
+Price: {{extra_luggage_bill.total_price}}$
+
+Thank you for choosing Django Air!

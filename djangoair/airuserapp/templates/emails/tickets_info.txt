@@ -1,0 +1,13 @@
+Your tickets:
+
+Flight: {{ticket.flight}}
+Quantity: {{ticket.tickets_quantity}}
+Price (per ticket): {{ticket.flight.ticket_price}}$
+Lunch: {{ticket.lunch}}
+Luggage: {{ticket.luggage}}
+
+Total price: {{total_price}}$
+
+Please note, that you need to complete payment to proceed with your flight. Check your personal cabinet for details.
+
+Thank you for choosing Django Air!

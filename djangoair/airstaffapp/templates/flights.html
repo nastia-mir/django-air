@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<p><a href="{% url 'staff:create flight' %}" class="btn btn-outline-primary">Create new flight</a></p>
+
+{% if empty %}
+<p>There's no flights yet.</p>
+{% else %}
+
+<ul class="list-group list-group-flush">
+    {% for flight in flights %}
+    {% if not flight.is_canceled %}
+
+    <li class="list-group-item">
+        <a href="{% url 'staff:flight details' flight.id %}" class="text-decoration-none text-body">{{flight}}</a>
+        <a href="{% url 'staff:cancel flight' flight.id %}" class="text-danger text-decoration-none">Cancel flight</a>
+    </li>
+
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+</br>
+<a href="{% url 'staff:canceled flights' %}" class="btn btn-outline-secondary">Canceled flights.</a>
+
+{% endblock %}

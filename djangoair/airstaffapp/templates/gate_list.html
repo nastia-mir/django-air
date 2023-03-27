@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<ul class="list-group list-group-flush">
+    {% for register_request in object_list  %}
+
+    <li class="list-group-item">
+        <a href="{% url 'staff:gate register' register_request.id %}"
+           class="text-decoration-none text-body">{{register_request}}</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

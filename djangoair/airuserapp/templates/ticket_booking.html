@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h5 class="text-decoration-underline">Last steps</h5>
+<div class="card" style="width: 36rem;">
+    <div class="card-body">
+
+
+
+        <p><b>Flight:</b> {{ticket.flight}}</p>
+        <p><b>Quantity:</b> {{ticket.tickets_quantity}}</p>
+        <p><b>Price (per ticket):</b> {{ticket.flight.ticket_price}}$</p>
+        <p><b>Lunch (price per ticket):</b> {{ticket.lunch}}</p>
+        <p><b>Luggage (price per ticket):</b> {{ticket.luggage}}</p>
+
+        <br/>
+        <p><b>Total price:</b> {{total_price}}$</p>
+
+    </div>
+</div>
+<br/>
+
+<form method="POST">
+    {% csrf_token %}
+    <label class="form-label">You will receive your tickets via email.</label>
+    {{form.as_p}}
+    <input class="btn btn-primary" type="submit" value="Book tickets"/>
+</form>
+
+
+{% endblock %}

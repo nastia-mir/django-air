@@ -1,0 +1,6 @@
+You had sucessfully paid for your tickets.
+
+Tickets: {{ticket_bill.ticket}}
+Price: {{ticket_bill.total_price}}$
+
+Thank you for choosing Django Air!

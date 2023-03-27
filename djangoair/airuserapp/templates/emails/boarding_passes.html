@@ -1,0 +1,16 @@
+<p>You finished check-in successfully. Here's the list of your boarding passes:</p> <br/>
+
+{% for boarding_pass in boarding_passes_list %}
+<p>-------------------------------------------------------------</p>
+
+<h2>{{boarding_pass.code}}</h2>
+<br/>
+<p>Destination: {{boarding_pass.ticket.flight.get_destination_display}}</p>
+<p>Date: {{boarding_pass.ticket.flight.date}}</p>
+<p>Passenger: {{boarding_pass.passenger}}</p>
+
+<p>Lunch: {{boarding_pass.ticket.lunch}}</p>
+<p>Luggage: {{boarding_pass.ticket.luggage}}, extra: {{boarding_pass.extra_luggage.amount}} </p>
+
+{% endfor %}
+

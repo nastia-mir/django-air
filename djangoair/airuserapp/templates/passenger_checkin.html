@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% if check_in %}
+<h3>You have already finished your check-in.</h3>
+{% else %}
+
+{% if full_name_form and extra_luggage_form %}
+<form method="POST">
+    {% csrf_token %}
+    {{full_name_form.as_p}}
+    {{extra_luggage_form.as_p}}
+    <label class="form-label">You need to add {{left}} more passengers.</label> </br>
+    <input class="btn btn-outline-primary" type="submit" name="add_passenger" value="Add passenger"/>
+</form>
+{% else %}
+
+{% if left == 0 %}
+<form method="POST">
+    {% csrf_token %}
+    <input class="btn btn-primary" type="submit" name="checkin" value="Finish check-in"/>
+</form>
+
+{% elif left == -1 %}
+<p>You entered too many passengers. Please check the data you provided.</p>
+{% endif %}
+
+{% endif %}
+
+</br>
+
+{% if checkins %}
+
+<ul class="list-group list-group-flush">
+    {% for checkin in checkins %}
+
+    <li class="list-group-item">
+        <p class="me-1">
+            {% if checkin.extra_luggage %}
+            {{checkin.extra_luggage}}
+            {% else %}
+            {{checkin.passenger}}
+            {% endif %}
+        </p>
+        <a href="{% url 'passengers:delete checkin' checkin.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<form method="POST" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Create"/>
+</form>
+
+</br>
+<ul class="list-group list-group-flush">
+    {% for luggage in options %}
+
+    <li class="list-group-item">
+        {{luggage}}
+        <a href="{% url 'staff:delete luggage' luggage.id %}" class="text-danger text-decoration-none">Delete</a>
+    </li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

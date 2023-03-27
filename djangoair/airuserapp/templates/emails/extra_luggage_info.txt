@@ -1,0 +1,11 @@
+You had chosen extra luggage for some of your tickets:
+
+{% for checkin in extra_luggage_checkins %}
+
+Passenger: {{checkin.passenger}}
+Quantity: {{checkin.extra_luggage.amount}}
+Price (per 1): {{checkin.ticket.flight.extra_luggage_price}}
+
+{% endfor %}
+
+Thank you for choosing Django Air!

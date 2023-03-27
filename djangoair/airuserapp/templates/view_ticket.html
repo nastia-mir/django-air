@@ -1,0 +1,71 @@
+{% extends  "main.html" %}
+{% block content %}
+
+{% if request.user.is_authenticated %}
+<div class="card" style="width: 32rem;">
+    <div class="card-body">
+
+        <h5 class="card-title">
+            {{ticket.flight}}
+        </h5>
+        </br>
+
+        <p><b>Passengers:</b> {{ticket.tickets_quantity}}</p>
+        <p><b>Price (per ticket):</b> {{ticket.flight.ticket_price}}$</p>
+        <p><b>Lunch:</b> {{ticket.lunch}}</p>
+        <p><b>Luggage:</b> {{ticket.luggage}}</p>
+
+        <br/>
+        {% if not ticket.flight.is_canceled %}
+
+            {% if not ticket.is_paid %}
+                <p><b>Total:</b> {{price}}$</p>
+                <p>You have to complete the payment to proceed.</p>
+                {% include 'ticket_payment.html' %}
+            {% else %}
+
+                <p><b>Check-in status:</b> {{ticket.get_check_in_display}}</p>
+                {% if ticket.check_in == 'no_checkin' or ticket.check_in == 'editing' %}
+                    <a href="{% url 'passengers:checkin' ticket.id %}" class="btn btn-outline-primary">Check-in</a>
+
+                {% elif ticket.check_in == 'waiting_for_extra_payment' %}
+                    <br/>
+                    <p><b>Extra luggage price:</b> {{price}}$</p>
+                    <p>You have to complete extra luggage payment to proceed.</p>
+                    {% include 'extra_luggage_payment.html' %}
+
+                {% elif ticket.check_in == 'completed' %}
+
+                    <p><b>Registration status:</b> {{ticket.get_gate_registration_display}}</p>
+
+                    {% if ticket.gate_registration == 'not_registered' %}
+                        <a href="{% url 'passengers:gate register' ticket.id %}" class="btn btn-outline-primary">Register</a>
+                    {% endif %}
+
+                {% endif %}
+            {% endif %}
+
+            {% else %}
+                <p>Unfortunately, this flight had been cancelled.</p>
+
+            {% if not ticket.is_refunded %}
+            <form action="{% url 'passengers:refund' ticket.id %}" id="payment-form" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-success">Refund</button>
+            </form>
+            {% else %}
+            <p>You will receive your refund as soon as possible.</p>
+            {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+{% else %}
+<h2>You need to login to view you tickets details.</h2>
+{% endif %}
+
+{% endblock %}

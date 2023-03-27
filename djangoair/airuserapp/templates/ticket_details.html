@@ -1,0 +1,34 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h5>{{ticket.flight}}</h5>
+
+<p><b>Price</b>: {{ticket_price}}$</p>
+
+<h5>Would you like to add something?</h5>
+
+<form method="POST">
+    {% csrf_token %}
+   <p>
+        <label for="lunch-select">Choose lunch:</label>
+
+        <select name="lunch" class="form-control" id="lunch-select">
+            {% for lunch in lunch_options %}
+            <option name="{{ lunch.id }}">{{ lunch }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="luggage-select">Choose luggage:</label>
+
+        <select name="luggage" class="form-control" id="luggage-select">
+            {% for luggage in luggage_options %}
+            <option value="{{ luggage }}">{{ luggage }}</option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <input class="btn btn-primary" type="submit" value="Proceed"/>
+</form>
+
+{% endblock %}
