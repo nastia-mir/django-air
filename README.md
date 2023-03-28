@@ -28,4 +28,4 @@ Staff can have 1 of 3 roles:
 
 - check-in manager: confirms passenger check-ins;
 - gate manager: confirms gate registration;
-- supervisor: can do everything that check-in and gate managers do, and also edit their roless, create/cancel flights, add or remove flight options.
+- supervisor: can do everything that check-in and gate managers do, and also edit their roles, create/cancel flights, add or remove flight options.
